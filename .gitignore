@@ -7,3 +7,4 @@ parsnp_linux/parsnp_output/*
 ksnp/ksnp_output/*
 ksnp/result_folder/*
 stdout.txt
+results/*

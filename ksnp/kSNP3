@@ -443,7 +443,7 @@ $kSNP/SNPs_all_2_fasta_matrix3 SNPs_all SNPs_all_matrix.fasta SNPs_all_matrix
 
 ## Building ML FastTree tree from all SNPs
 if ($?ML) then
- $kSNP/$os_path/FastTreeMP  -nt -gtr -slow SNPs_all_matrix.fasta >!  tree.ML.tre
+ $kSNP/$os_path/FastTreeMP -nt -gtr -slow SNPs_all_matrix.fasta >!  tree.ML.tre
  printf "ML\n" >> tree_list1
  printf "ML\n" >> tree_list2
 endif

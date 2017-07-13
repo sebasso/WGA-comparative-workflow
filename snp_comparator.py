@@ -101,7 +101,6 @@ def count_snps_per_genome(snp_lists_files):
 
 def compare_snps(SNP_files):
     files = SNP_files
-    #files = SNP_files
     numfiles = len(files)
 
     if numfiles <= 1:
@@ -130,7 +129,7 @@ def compare_snps(SNP_files):
     for entry, value in stats.items():
         print 'key: ',entry,'\t value: ',value
 
-    with open("snps_stats.json","w") as f:
+    with open("snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
         f.write(r)
 
     print "json stats: \n", r

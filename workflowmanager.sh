@@ -34,7 +34,10 @@ exit_module(){
   exit
 }
 
-printf 'cmd line args:\n%s\n' "$@"
+printf "@args:\n"
+printf '%s\n' "$@"
+
+#while cmd line args > 0 # ${#} = number of cmd arg lines -> https://learnxinyminutes.com/docs/bash/
 while test ${#} -gt 0
 do
   case "$1" in
@@ -85,13 +88,13 @@ then
 fi
 
 #local variables
-#NOW=$(date +"%Y-%b-%d-%H:%M")
+NOW=$(date +"%Y-%b-%d-%H:%M")
 currdir=`pwd`
 kSNP_path=$currdir/ksnp
 parsnp_path=$currdir
 
 OS=`uname`
-printf "OS: $OS\n "
+printf "OS: $OS\nCores: $CPUS "
 
 #Setting up platform dependent executables for parsnp, ksnp/ is modified to fit any nix* platform
 if [ "$OS" == "Darwin" ];
@@ -102,10 +105,11 @@ then
   printf "$OS\n"
   parsnp_path="$parsnp_path/parsnp_linux"
 else
-  printf "\n Unknown os $OS"
+  printf "\n Unknown OS: $OS"
   exit_module
 fi
 
+#list files as one args as in galaxy framework when <param type=data multiple=true> , delimited set of inputfiles
 input_files=""
 for f in $genome_path/*
 do
@@ -123,9 +127,34 @@ cd ..
 ( $parsnp_path/./parsnp -r $ref -d $genome_path -o $parsnp_output -p $CPUS ) &
 
 wait # wait for further execution on subprocesses spawned above
-python $parsnp_path/parsnp_SNP_POS_extracter.py $parsnp_output
+echo `pwd`
+printf "\n parsnp_path: $parsnp_path\n"
+python parsnp_SNP_POS_extracter.py $parsnp_output
+
+wait
 
 printf "\nGenome alignment are done\n"
 python snp_comparator.py $kSNP_path/result_folder/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_SNPs_POS_formatted.tsv
 printf "\nComparison of genome alignment -> Done \n"
+
+
+#cleanup and order folders for results
+main_result_folder=$currdir/"results"
+run_specific=$main_result_folder"/$NOW-results"
+
+if [ ! -d  $main_result_folder ]; then
+      mkdir $main_result_folder
+fi
+mkdir $run_specific
+mv snps_stats.json $run_specific
+mv "$kSNP_path/result_folder" $run_specific
+mv $parsnp_output $run_specific
+
+### space saving ##
+#xmfa gets really large really fast, keep binary file parsnp.ggr | saves around 80 times disk space
+# -> to get it back RUN: ./harvest_osx -i $run_specific/parsnp.ggr -X $run_specific/parsnp.xmfa #inside parsnp_folder
+rm $run_specific/parsnp_output/parsnp.xmfa
+#all information available in SNPs_all is available in kSNP_SNPs_POS_formatted.tsv minus extra data of kmers
+rm $run_specific/result_folder/SNPs_all
+
 exit_module
