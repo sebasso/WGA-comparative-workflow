@@ -1,0 +1,119 @@
+cmd line args:
+-ref
+cmd line args:
+/Users/sebastiansoberg/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta
+cmd line args:
+-genomedir
+cmd line args:
+/Users/sebastiansoberg/Downloads/Example1/Genomes
+
+ref: /Users/sebastiansoberg/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta
+/Users/sebastiansoberg/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta
+
+ gpath: /Users/sebastiansoberg/Downloads/Example1/Genomes
+OS: Darwin
+ The home directory is /Users/sebastiansoberg/Desktop/abelworkflow/ksnp
+Location of kSNP scripts: 
+/Users/sebastiansoberg/Desktop/abelworkflow/ksnp
+dir /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/ksnp_output
+fasta_list /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/in_list
+annotate_list /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/annotate_genomes
+genbankFile /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/nonexistent_file
+
+os_path:
+mac_specific 
+*************************************************************************************
+SETTINGS:
+|-refgenome:	/Users/sebastiansoberg/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta
+|-aligner:	libMUSCLE
+|-seqdir:	/Users/sebastiansoberg/Downloads/Example1/Genomes
+|-outdir:	/Users/sebastiansoberg/Desktop/abelworkflow/parsnp_mac/parsnp_output
+|-OS:		Darwin
+|-threads:	4
+*************************************************************************************
+
+<<Parsnp started>>
+
+  |->[OK]
+-->Running Parsnp multi-MUM search and libMUSCLE aligner..
+  |->[OK]
+-->Running PhiPack on LCBs to detect recombination..
+-->Reconstructing core genome phylogeny..
+  |->[OK]
+-->Creating Gingr input file..
+  |->[OK]
+-->Calculating wall clock time.. 
+  |->Aligned 8 genomes in 0.21 seconds
+
+<<Parsnp finished! All output available in /Users/sebastiansoberg/Desktop/abelworkflow/parsnp_mac/parsnp_output>>
+
+Validating output directory contents...
+	1)parsnp.tree:		newick format tree 			[OK]
+	2)parsnp.ggr:		harvest input file for gingr (GUI) 	[OK]
+	3)parsnp.xmfa:		XMFA formatted multi-alignment 		[OK]
+
+Starting kSNP
+Thu Jul 13 12:58:43 CEST 2017
+input fasta_list: /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/in_list
+output directory: /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/ksnp_output
+k=13
+annotate_list file: /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/annotate_genomes
+Report minimal annotations.
+Number CPUs: 4
+Number of input sequences: 11 
+Thu Jul 13 12:58:44 CEST 2017
+Running jellyfish to find k-mers
+fsplit0
+fsplit1
+fsplit10
+fsplit2
+fsplit3
+fsplit4
+fsplit5
+fsplit6
+fsplit7
+fsplit8
+fsplit9
+Finished running jellyfish
+Removing kmers that occur less than freq=average of median and mean kmer frequency for that genome.
+Thu Jul 13 12:58:47 CEST 2017
+Thu Jul 13 12:58:49 CEST 2017
+Removing conflicting kmers from each genome with conflicting alleles
+Thu Jul 13 12:58:49 CEST 2017
+Finished removing conflicting kmers
+Thu Jul 13 12:59:36 CEST 2017
+Merged sorted kmer files and remove duplicates
+Thu Jul 13 12:59:36 CEST 2017
+Finished merging kmers across genomes
+Thu Jul 13 12:59:40 CEST 2017
+Discovering new SNPs
+
+Thu Jul 13 12:59:40 CEST 2017
+Finding kmers with multiple allele variants
+Finished finding kmers with multiple allele variants
+Thu Jul 13 12:59:44 CEST 2017
+Finding allele in each genome
+Finding SNP positions in finished genomes using mummer.
+Thu Jul 13 13:00:30 CEST 2017
+Thu Jul 13 13:00:30 CEST 2017
+Finished finding SNP positions in finished genomes using mummer.
+Concatenate results for each genome and sort by locus to create  SNPs_all_labelLoci
+Thu Jul 13 13:00:30 CEST 2017
+Number_SNPs: 943
+results_folder: /Users/sebastiansoberg/Desktop/abelworkflow/ksnp/result_folder
+['/Users/sebastiansoberg/Desktop/abelworkflow/ksnp/kSNP_SNP_POS_extracter.py', 'SNPs_all']
+['/Users/sebastiansoberg/Desktop/abelworkflow/parsnp_mac/parsnp_SNP_POS_extracter.py', '/Users/sebastiansoberg/Desktop/abelworkflow/parsnp_mac/parsnp_output']
+
+Genome alignment are done
+key:  total_snps 	 value:  [5320, 456]
+key:  same_loci_filename 	 value:  []
+key:  tool_names 	 value:  ['kSNP\n', 'parsnp\n']
+key:  SNPs_per_genome 	 value:  [Counter({'EEE_NJ-60.fasta': 547, 'EEE_PatentWO2005000881.fasta': 542, 'EEE_Florida91-4697.fasta': 542, 'EEE_NorthAmerican_antigenic_variety.fasta': 536, 'EEE_Georgia97.fasta': 536, 'EEE_ref_gi21218484.fasta': 533, 'EEE_PE6.fasta': 530, 'EEE_FL93-939.fasta': 530, 'EEE_PE-0_0155.fasta': 356, 'EEE_PE-3_0815.fasta': 348, 'EEE_BeAr436087.fasta': 320}), Counter({'EEE_ref_gi21218484.fasta': 57, 'EEE_PE6.fasta': 57, 'EEE_NorthAmerican_antigenic_variety.fasta': 57, 'EEE_Georgia97.fasta': 57, 'EEE_FL93-939.fasta': 57, 'EEE_Florida91-4697.fasta': 57, 'EEE_PatentWO2005000881.fasta': 57, 'EEE_NJ-60.fasta': 57})]
+key:  same_loci_snps 	 value:  ['EEE_BeAr436087.fasta', 'EEE_Florida91-4697.fasta', 'EEE_BeAr436087.fasta', 'EEE_Georgia97.fasta', 'EEE_BeAr436087.fasta', 'EEE_FL93-939.fasta', 'EEE_BeAr436087.fasta', 'EEE_NorthAmerican_antigenic_variety.fasta', 'EEE_BeAr436087.fasta', 'EEE_NJ-60.fasta', 'EEE_BeAr436087.fasta', 'EEE_PE6.fasta', 'EEE_BeAr436087.fasta', 'EEE_PatentWO2005000881.fasta', 'EEE_BeAr436087.fasta', 'EEE_ref_gi21218484.fasta', 'EEE_PE-0_0155.fasta', 'EEE_Florida91-4697.fasta', 'EEE_PE-0_0155.fasta', 'EEE_Georgia97.fasta', 'EEE_PE-0_0155.fasta', 'EEE_FL93-939.fasta', 'EEE_PE-0_0155.fasta', 'EEE_NorthAmerican_antigenic_variety.fasta', 'EEE_PE-0_0155.fasta', 'EEE_NJ-60.fasta', 'EEE_PE-0_0155.fasta', 'EEE_PE6.fasta', 'EEE_PE-0_0155.fasta', 'EEE_PatentWO2005000881.fasta', 'EEE_PE-0_0155.fasta', 'EEE_ref_gi21218484.fasta', 'EEE_PE-3_0815.fasta', 'EEE_Florida91-4697.fasta', 'EEE_PE-3_0815.fasta', 'EEE_Georgia97.fasta', 'EEE_PE-3_0815.fasta', 'EEE_FL93-939.fasta', 'EEE_PE-3_0815.fasta', 'EEE_NorthAmerican_antigenic_variety.fasta', 'EEE_PE-3_0815.fasta', 'EEE_NJ-60.fasta', 'EEE_PE-3_0815.fasta', 'EEE_PE6.fasta', 'EEE_PE-3_0815.fasta', 'EEE_PatentWO2005000881.fasta', 'EEE_PE-3_0815.fasta', 'EEE_ref_gi21218484.fasta']
+json stats: 
+{"total_snps": [5320, 456], "same_loci_filename": [], "tool_names": ["kSNP\n", "parsnp\n"], "SNPs_per_genome": [{"EEE_PE-3_0815.fasta": 348, "EEE_BeAr436087.fasta": 320, "EEE_PE6.fasta": 530, "EEE_NorthAmerican_antigenic_variety.fasta": 536, "EEE_Georgia97.fasta": 536, "EEE_ref_gi21218484.fasta": 533, "EEE_FL93-939.fasta": 530, "EEE_NJ-60.fasta": 547, "EEE_PatentWO2005000881.fasta": 542, "EEE_PE-0_0155.fasta": 356, "EEE_Florida91-4697.fasta": 542}, {"EEE_ref_gi21218484.fasta": 57, "EEE_PE6.fasta": 57, "EEE_NorthAmerican_antigenic_variety.fasta": 57, "EEE_Georgia97.fasta": 57, "EEE_FL93-939.fasta": 57, "EEE_Florida91-4697.fasta": 57, "EEE_PatentWO2005000881.fasta": 57, "EEE_NJ-60.fasta": 57}], "same_loci_snps": ["EEE_BeAr436087.fasta", "EEE_Florida91-4697.fasta", "EEE_BeAr436087.fasta", "EEE_Georgia97.fasta", "EEE_BeAr436087.fasta", "EEE_FL93-939.fasta", "EEE_BeAr436087.fasta", "EEE_NorthAmerican_antigenic_variety.fasta", "EEE_BeAr436087.fasta", "EEE_NJ-60.fasta", "EEE_BeAr436087.fasta", "EEE_PE6.fasta", "EEE_BeAr436087.fasta", "EEE_PatentWO2005000881.fasta", "EEE_BeAr436087.fasta", "EEE_ref_gi21218484.fasta", "EEE_PE-0_0155.fasta", "EEE_Florida91-4697.fasta", "EEE_PE-0_0155.fasta", "EEE_Georgia97.fasta", "EEE_PE-0_0155.fasta", "EEE_FL93-939.fasta", "EEE_PE-0_0155.fasta", "EEE_NorthAmerican_antigenic_variety.fasta", "EEE_PE-0_0155.fasta", "EEE_NJ-60.fasta", "EEE_PE-0_0155.fasta", "EEE_PE6.fasta", "EEE_PE-0_0155.fasta", "EEE_PatentWO2005000881.fasta", "EEE_PE-0_0155.fasta", "EEE_ref_gi21218484.fasta", "EEE_PE-3_0815.fasta", "EEE_Florida91-4697.fasta", "EEE_PE-3_0815.fasta", "EEE_Georgia97.fasta", "EEE_PE-3_0815.fasta", "EEE_FL93-939.fasta", "EEE_PE-3_0815.fasta", "EEE_NorthAmerican_antigenic_variety.fasta", "EEE_PE-3_0815.fasta", "EEE_NJ-60.fasta", "EEE_PE-3_0815.fasta", "EEE_PE6.fasta", "EEE_PE-3_0815.fasta", "EEE_PatentWO2005000881.fasta", "EEE_PE-3_0815.fasta", "EEE_ref_gi21218484.fasta"]}
+
+Comparison of genome alignment -> Done 
+
+Exiting[####################################################################################################]
+done

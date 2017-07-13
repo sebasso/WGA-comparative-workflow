@@ -4,3 +4,6 @@
 ksnp/ksnp_output/*
 parsnp_mac/parsnp_output/*
 parsnp_linux/parsnp_output/*
+ksnp/ksnp_output/*
+ksnp/result_folder/*
+stdout.txt

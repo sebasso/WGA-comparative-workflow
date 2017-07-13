@@ -65,13 +65,12 @@ while ($#argv > 0)
       set words = `echo $fasta_list:q | sed 's/,/ /g'`
       touch in_list
       touch annotate_genomes
-      foreach word ($words:q)
+      foreach word ($words)
         set base=`basename $word`
         printf "$word\t$base\n" >> in_list
         printf "$base\n" >> annotate_genomes
       end
       set fasta_list=`pwd`/in_list
-      cat annotate_genomes
       set annotate_list=`pwd`/annotate_genomes
       breaksw
         case -outdir:
@@ -154,23 +153,19 @@ set OS=`uname`
 if ($OS == 'Darwin') then
   set os_path="mac_specific"
 else
+  # assuming nix
   set os_path="linux_specific"
 endif
-printf "\n os_path:\n $os_path \n"
 
-printf "\n python version\n"
-python -V
+printf "\nos_path:\n$os_path \n"
 
 if ($?kchooser) then
   if ($kchooser == "1") then
-    printf "k before kchooser: $k\n"
     set k=`python $kSNP/Kchooser-allFiles.py in_list $kSNP $os_path`
-    printf "\nsat k with kchooser k:$k\n"
   endif
 else
   printf "Kchooser variable is undefined\n"
 endif
-
 
 
 echo "Starting kSNP"
@@ -181,6 +176,7 @@ echo "input fasta_list: $fasta_list"
 echo "output directory: $dir"
 echo "k=$k"
 echo "annotate_list file: $annotate_list"
+
 if ($all_annotations == 1) then
     echo "Report all annotations."
 else
@@ -222,6 +218,7 @@ endif
 
 echo "Number CPUs: $num_cpus"
 
+
 #chesk the fasta genome files to be sure line endings are Unix and fix if they are not
 cp -f "$fasta_list" fasta_list
 $kSNP/LE2Unix fasta_list
@@ -230,8 +227,9 @@ $kSNP/LE2Unix fasta_list
 #$kSNP/genome_names3  "$fasta"
 
 if !( -e "$dir") then
-mkdir "$dir"
+  mkdir "$dir"
 endif
+
 cd "$dir"
 
 if ( -e "$annotate_list") then
@@ -242,10 +240,9 @@ endif
 
 cp -f "$fasta_list" fasta_list
 
-
-echo "Finished genomes for finding SNP positions:"
-cat annotate_list
-echo ""
+#echo "Finished genomes for finding SNP positions:"
+#cat annotate_list
+#echo ""
 
 
 # Make lookup table of genome names and fsplit# files, and create fsplit# files by merging entries of multi-contig/multi-read input genomes.
@@ -256,7 +253,7 @@ printf "" >! fileName2genomeName
 while ($count < $num_seqs)
     set name=`awk -F'\011' -v c="$count" 'FNR==c+1 {print $2}' fasta_list`
     set file=`awk -F'\011' -v c="$count" 'FNR==c+1 {print $1}' fasta_list`
-    printf "$count\t$name\t$file\n"
+    #printf "$count\t$name\t$file\n"
     $kSNP/merge_fasta_reads3  "$file" >! fsplit$count
     printf "fsplit$count\t$name\n" >> fileName2genomeName
     @ count ++
@@ -303,7 +300,7 @@ date
 foreach f (fsplit*[0-9])
   awk '{print $2}' kmers_all.$f > ! freq.$f
   set min_kmer_coverage=`$kSNP/$os_path/get_quantile3 freq.$f`
-  echo "minimum kmer coverage for $f is $min_kmer_coverage"
+  #echo "minimum kmer coverage for $f is $min_kmer_coverage"
   awk -v m=$min_kmer_coverage '$2>=m {print}' kmers_all.$f >! kmers.$f
 end
 date
@@ -313,13 +310,13 @@ rm freq.*
 echo "Removing conflicting kmers from each genome with conflicting alleles"
 date
 foreach f (fsplit*)
-    echo $f
+    #echo $f
     mkdir Dir.$f
     cd Dir.$f
     $kSNP/subset_mers3 ../kmers.$f
     printf "" >! cmds_remove_conflicting
     foreach subset (*.mers)
-	echo "$kSNP/delete_allele_conflicts3 $subset" >> cmds_remove_conflicting
+	   echo "$kSNP/delete_allele_conflicts3 $subset" >> cmds_remove_conflicting
     end
     $kSNP/parallel_commands3 $num_cpus cmds_remove_conflicting
     cd ..
@@ -394,7 +391,7 @@ if (-s annotate_list) then
 	set f=`grep -w  $genome fileName2genomeName | awk '{print $1}'`
 	if ($test > 0 ) then
 	    set file=`grep -w  $genome fasta_list  | awk -F'\011' '{print $1}'`
-	    printf "genome: $genome  in Dir.$f\n"
+	    #printf "genome: $genome  in Dir.$f\n"
 	    awk -F'\011' '{print ">" $1 "_" $2 "\n" $3 }' Dir.$f/SNPs >! Dir.$f/SNPs.fasta
 	    printf "$kSNP/$os_path/mummer -maxmatch -l $k -b -c  Dir.$f/SNPs.fasta "'"'"$file"'"'" > Dir.$f/mummer.out\n" >> cmds_mummer
 	    printf "$kSNP/parse_mummer4kSNP3  Dir.$f/mummer.out  > Dir.$f/SNP.positions\n" >> cmds_parse_mummer
@@ -406,6 +403,7 @@ if (-s annotate_list) then
     echo "Finished finding SNP positions in finished genomes using mummer."
 endif
 
+
 # concatenate SNP files for each genome into one and sort it, and number the loci
 echo "Concatenate results for each genome and sort by locus to create  SNPs_all_labelLoci"
 date
@@ -414,7 +412,7 @@ foreach f (fsplit*)
     set test=`grep -w  $f fileName2genomeName | wc -l`
     if ($test > 0 ) then
 	set genome=`grep -w  $f fileName2genomeName | awk '{print $2}'`
-	printf "genome: $genome  in Dir.$f\n"
+	#printf "genome: $genome  in Dir.$f\n"
 	if (-s Dir.$f/SNP.positions) then
 	    awk -F'\011' -v f=$f '{print $1 "\t" $2 "\t" $3  "\t" f "\t" $4}' Dir.$f/SNP.positions  >> all_SNPs_unsorted
 	    #cat Dir.$f/SNP.positions >> all_SNPs_unsorted
@@ -431,35 +429,31 @@ sort -u all_SNPs_unsorted >! all_SNPs_sorted
 $kSNP/number_SNPs_all3 all_SNPs_sorted
 $kSNP/rename_from_table3 all_SNPs_sorted_labelLoci fileName2genomeName SNPs_all
 
-#creates sorted formatted SNP position list for analysis
-file kSNP_SNPs_POS_formatted.tsv
+set results_folder=$kSNP/result_folder
+printf "results_folder: $results_folder\n"
+if !( -e "$results_folder") then
+  mkdir "$results_folder"
+endif
+
+
+#SNP extraction
 python $kSNP/kSNP_SNP_POS_extracter.py SNPs_all
-file kSNP_SNPs_POS_formatted.tsv
 
-
-
-# Set reference genome for vcf file to the be first finished genome, if this is empty, then set it to be the first genome in the input fasta file.
-if (-s annotate_list) then
-    set ref_genome=`head -1 annotate_list`
-endif
-if !($?ref_genome) then
-    set ref_genome=`head -1 fileName2genomeName | awk '{print $2}'`
-endif
-
-
-echo "Finished finding SNPs"
-date
-
-##probes_from_SNPs_all_kmers $probe_prefix_label
-
-## Create a SNP matrix and fasta, for inputting to PHYLIP, FastTreeMP or other tools like SplitsTree
 $kSNP/SNPs_all_2_fasta_matrix3 SNPs_all SNPs_all_matrix.fasta SNPs_all_matrix
 
-
 ## Building ML FastTree tree from all SNPs
-
 if ($?ML) then
  $kSNP/$os_path/FastTreeMP  -nt -gtr -slow SNPs_all_matrix.fasta >!  tree.ML.tre
  printf "ML\n" >> tree_list1
  printf "ML\n" >> tree_list2
 endif
+
+cp $dir/SNPs_all $results_folder
+cp $dir/tree.ML.tre $results_folder
+cp $dir/kSNP_SNPs_POS_formatted.tsv $results_folder
+cd $kSNP
+rm -rf $dir
+#cleanup
+rm $kSNP/in_list
+rm $kSNP/annotate_genomes
+rm $kSNP/fasta_list

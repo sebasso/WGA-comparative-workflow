@@ -112,7 +112,6 @@ def compare_snps(SNP_files):
 
     stats = {}
 
-
     stats["tool_names"] = tool_names
     stats["total_snps"] = []
 
@@ -121,7 +120,6 @@ def compare_snps(SNP_files):
         stats["total_snps"].append(len(snp_lists_files[i]))
 
     stats["SNPs_per_genome"] = count_snps_per_genome(snp_lists_files)
-    #stats["SNPs_loci_occurence"] = []
 
     SNPs_loci, SNPs_loci_filename = find_SNPs_in_same_position(snp_lists_files)
     stats["same_loci_snps"] = SNPs_loci
@@ -139,7 +137,10 @@ def compare_snps(SNP_files):
     #SNPSs in total     #total number of snps per tool = len(all_files[0]), len(all_files[1]) ... len(all_files[x])
     #collections.counter can easily find how many snps occur at one position, however not so relevant in comparison
 
-    #also mention files not present in one of the TOOLs, typically parsnp due to "core-genome"
-
+    """
+    NB:
+    1. parsnp doesnt compare all fasta files, will be differen output there
+    2. parsnp -> core genome always same amount of snps?
+    """
 if __name__ == '__main__':
     compare_snps(sys.argv[1:])

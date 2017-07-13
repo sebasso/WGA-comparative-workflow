@@ -1,6 +1,10 @@
 #!/bin/bash
 #intended use on linux server cluster
 
+
+#USAGE: [-ref path_to_referencegenome] [-genomedir path_to_genome_directory] [-CPUS [num]]
+#example bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes
+
 #SBATCH --job-name=parsnpvsksnp-CPU-10-2GB
 #
 # Project:
@@ -16,6 +20,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --output=slurmLogs/slurm%j.txt
 
+
 exit_module(){
   printf "\nExiting"
   printf "["
@@ -29,7 +34,7 @@ exit_module(){
   exit
 }
 
-printf '%s\n' "$@"
+printf 'cmd line args:\n%s\n' "$@"
 while test ${#} -gt 0
 do
   case "$1" in
@@ -46,6 +51,11 @@ do
       printf "\n gpath: $genome_path\n"
       shift
       ;;
+      -CPUS)
+      shift
+      CPUS="$1"
+      shift
+      ;;
       *)
       echo "unknown cmd: $1"
       exit_module
@@ -55,7 +65,7 @@ do
 done
 
 
-
+#checking required options and type
 if [ -z "$ref" ] && [ ! -f "$ref" ];
 then
   printf "Reference genome must be supplied\n -ref path_to_referencegenome.fasta"
@@ -68,78 +78,54 @@ then
   exit_module
 fi
 
+#optional option
+if [ -z "$CPUS" ];
+then
+  CPUS=4
+fi
 
+#local variables
 #NOW=$(date +"%Y-%b-%d-%H:%M")
-
-#kSNP3/./kSNP3 -in in_list_scaffolds -outdir Res-campbyo/"$NOW-scaffolds" -k $kmer -CPU 10
 currdir=`pwd`
 kSNP_path=$currdir/ksnp
 parsnp_path=$currdir
 
-
-CPUS=10
-
 OS=`uname`
+printf "OS: $OS\n "
+
+#Setting up platform dependent executables for parsnp, ksnp/ is modified to fit any nix* platform
 if [ "$OS" == "Darwin" ];
 then
-  printf "$OS\n "
-  #testing purposes
   parsnp_path="$parsnp_path/parsnp_mac"
-
-  #TODO: change input format in KSNP main file
-  #TODO: change input format parsnp
-  #TODO: parsnp can put snp extracter outside main file
-  input_files=""
-  for f in $genome_path*
-  do
-    input_files="$input_files,$f"
-  done
-
-  ksnp_output="$kSNP_path/ksnp_output"
-  parsnp_output="$parsnp_path/parsnp_output"
-  printf "$kSNP_path\n"
-  printf "$parsnp_path\n"
-  file $kSNP_path/./kSNP3
-  file $parsnp_path/./parsnp
-  echo $CPUS
-  echo $ref
-  echo $genome_path
-  echo $kSNP_path
-  printf "ksnp output:\n$ksnp_output\n"
-  printf "ksnp output:\n$parsnp_output\n"
-  
-  ( $kSNP_path/./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS -kchooser "1" -ML -path $kSNP_path ) &
-  #( $parsnp_path/./parsnp -r $ref -d $genome_path -o $parsnp_output -p $CPUS ) &
-
-  wait
-  printf "\ngenome alignment are done\n"
-  #python snp_comparator.py $kSNP_path/$ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_path/$parsnp_output/kSNP_SNPs_POS_formatted.tsv
-  printf "\nDone  with comparison of genome alignment\n"
-  exit_module
 elif [ "$OS" == "Linux" ];
 then
   printf "$OS\n"
   parsnp_path="$parsnp_path/parsnp_linux"
-
-  # ksnp -path is where ksnp executable is
-  #change input_files on forehand to be on format filepath1,filepath2 from -d in parsnp
-  input_files=""
-  for f in $genome_path*
-  do
-    input_files="$input_files,$f"
-  done
-
-  ksnp_output="ksnp_output"
-  parsnp_output="parsnp_output"
-  ( $kSNP_path/.kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS -kchooser "1" -ML -path $kSNP_path ) &
-  ( $parsnp_path./parsnp -r $ref -d $genome_path -o $parsnp_output -p $CPUS ) &
-
-  wait
-  printf "\ngenome alignment are done\n"
-  python snp_comparator.py $kSNP_path/$ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_path/$parsnp_output/kSNP_SNPs_POS_formatted.tsv
-  printf "\nDone  with comparison of genome alignment\n"
-  exit_module
 else
   printf "\n Unknown os $OS"
   exit_module
 fi
+
+input_files=""
+for f in $genome_path/*
+do
+  input_files=$input_files","$f
+done
+input_files=${input_files:1}
+
+ksnp_output="$kSNP_path/ksnp_output"
+parsnp_output="$parsnp_path/parsnp_output"
+
+# spawning two subprocess, each for doing a WGS
+cd $kSNP_path
+( ./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS -kchooser "1" -ML -path $kSNP_path ) &
+cd ..
+( $parsnp_path/./parsnp -r $ref -d $genome_path -o $parsnp_output -p $CPUS ) &
+
+wait # wait for further execution on subprocesses spawned above
+python $parsnp_path/parsnp_SNP_POS_extracter.py $parsnp_output
+
+printf "\nGenome alignment are done\n"
+python snp_comparator.py $kSNP_path/result_folder/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_SNPs_POS_formatted.tsv
+printf "\nComparison of genome alignment -> Done \n"
+exit_module
