@@ -102,10 +102,9 @@ then
   parsnp_path="$parsnp_path/parsnp_mac"
 elif [ "$OS" == "Linux" ];
 then
-  printf "$OS\n"
   parsnp_path="$parsnp_path/parsnp_linux"
 else
-  printf "\n Unknown OS: $OS"
+  printf "\n OS not supported: $OS"
   exit_module
 fi
 
@@ -120,14 +119,33 @@ input_files=${input_files:1}
 ksnp_output="$kSNP_path/ksnp_output"
 parsnp_output="$parsnp_path/parsnp_output"
 
-# spawning two subprocess, each for doing a WGS
-cd $kSNP_path
-( ./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS -kchooser "1" -ML -path $kSNP_path ) &
-cd ..
-( $parsnp_path/./parsnp -r $ref -d $genome_path -o $parsnp_output -p $CPUS ) &
+# spawning two subshells, each for doing a different WGA
 
-wait # wait for further execution on subprocesses spawned above
+(
+cd $kSNP_path
+./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS -kchooser "1" -ML -path $kSNP_path
+) &
+#ksnp_stdout=$( ./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS -kchooser "1" -ML -path $kSNP_path ) &
+
+(
+cd $parsnp_path
+python ./Parsnp.py -r $reference_genome -d $input_files -p $CPUS -o $parsnp_output
+) &
+cd ..
+#parsnp_stdout=$( $parsnp_path/./parsnp -r $ref -d $genome_path -o $parsnp_output -p $CPUS ) &
+
+printf "ksnp output length: ${#ksnp_stdout}"
+printf "parsnp output length: ${#parsnp_stdout}"
+
+#output=$(command)
+#output=$(command 2>&1)
+#status=$?
+
+wait # waits for subshells
+printf "ksnp output length after wait: ${#ksnp_stdout}"
+printf "parsnp output length after wait: ${#parsnp_stdout}"
 echo `pwd`
+exit
 printf "\n parsnp_path: $parsnp_path\n"
 python parsnp_SNP_POS_extracter.py $parsnp_output
 

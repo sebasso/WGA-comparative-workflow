@@ -115,13 +115,6 @@ echo "Location of kSNP scripts: "
 echo "$kSNP"
 
 
-$kSNP/CheckFileNames $fasta_list
-if (-f 'NameErrors.txt') then
-	echo "pKSNP3 terminated because of error file being present."
-	exit
-endif
-
-
 if ($?dir) then
     set dir = `$kSNP/add_paths3 "$dir" "$thisDir"`
     printf "dir $dir\n"
