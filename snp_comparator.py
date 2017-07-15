@@ -52,13 +52,15 @@ import json
 def readfiles(files):
     all_files = []
     tool_names = []
+    
     for f in files:
         with open(f,"r") as f:
             tmp = f.readlines()
             filename = tmp[0]
-            sys.stderr.write("\n"+filename+"\n")
             all_files.append(tmp[1:])
             tool_names.append(filename)
+    
+    sys.stdout.write("Comparing tools: "+str(tool_names)+"\n")
 
     return all_files, tool_names
 
@@ -114,31 +116,34 @@ def compare_snps(SNP_files):
     stats["tool_names"] = tool_names
     stats["total_snps"] = []
 
+    ### SETTING stats:
     #total number of snps per tool = len(all_files[0]), len(all_files[1]) ... len(all_files[x])
     for i in xrange(0,len(snp_lists_files)):
         stats["total_snps"].append(len(snp_lists_files[i]))
 
+    
     stats["SNPs_per_genome"] = count_snps_per_genome(snp_lists_files)
-
+    
     SNPs_loci, SNPs_loci_filename = find_SNPs_in_same_position(snp_lists_files)
     stats["same_loci_snps"] = SNPs_loci
     stats["same_loci_filename"] = SNPs_loci_filename
 
-    r = json.dumps(stats)
-
-    for entry, value in stats.items():
-        print 'key: ',entry,'\t value: ',value
+    r = json.dumps(stats, indent=4, encoding="utf-8", sort_keys=True)
 
     with open("snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
         f.write(r)
+    
 
-    print "json stats: \n", r
+    ### Printing stats
+    #for entry, value in stats.items():
+    #    print 'key: ',entry,'\t value: ',value
+    print "\nSnps comparator OUTPUT: \n", r, "\n"
     #SNPSs in total     #total number of snps per tool = len(all_files[0]), len(all_files[1]) ... len(all_files[x])
     #collections.counter can easily find how many snps occur at one position, however not so relevant in comparison
 
     """
     NB:
-    1. parsnp doesnt compare all fasta files, will be differen output there
+    1. parsnp doesnt compare all fasta files, will be different output there
     2. parsnp -> core genome always same amount of snps?
     """
 if __name__ == '__main__':

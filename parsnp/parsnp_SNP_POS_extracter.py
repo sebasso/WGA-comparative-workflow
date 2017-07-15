@@ -71,9 +71,7 @@ def parsesnps():
 			output = placeholder[0]+sep+entry[0]+sep+entry[1]+sep+placeholder[1]
 			outputFormattedSnps.append(output)
 
-
-	currpath=os.getcwd()
-	outputfile=currpath+"/"+"parsnp_SNPs_POS_formatted.tsv"
+	outputfile=sys.argv[2]+"/parsnp_SNPs_POS_formatted.tsv"
 
 	#sort on SNP position
 	outputFormattedSnps = sorted(outputFormattedSnps, key=lambda x: int(x.split("\t")[1]))
@@ -87,5 +85,5 @@ def parsesnps():
 
 if __name__ == '__main__':
 	print sys.argv
-	#usage: sys.argv[1] = SNPs_all file from kSNP output
+	#usage: sys.argv[1] = xmfa file from parsnp output
 	parsesnps()

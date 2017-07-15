@@ -1,0 +1,64 @@
+/usr/bin/time(gnu time) stats || brew install gnu- time aliased gtime
+Options:
+%E     Elapsed real time (in [hours:]minutes:seconds).
+
+%S     Total number of CPU-seconds that the process spent in kernel mode.
+
+%U     Total number of CPU-seconds that the process spent in user mode.
+
+%P %CPUS USAGE
+
+%M     Maximum resident set size of the process during its lifetime, in Kbytes.
+
+%W     Number of times the process was swapped out of main memory.
+
+%c     Number  of times the process was context-switched involuntarily (because the
+time slice expired).
+
+%I     Number of file system inputs by the process.
+
+%O     Number of file system outputs by the process.
+
+%C     (Not in tcsh.) Name and command-line arguments of the command being timed.
+
+time -f "formatted_string_here"
+
+Example without command(High spec) :
+/usr/bin/time -f "cpu secs for: %S user %S sys \telapsed time: %E CPU: %P\n%M max memory(bytes) %W swapped-out %c 
+context-switchs(involuntarily)\n%I num inputs files\t%O num output files\ncmd:\t%C" \ command options
+
+Example with command(High spec) :
+/usr/bin/time -f "cpu secs for: %S user %S sys \telapsed time: %E CPU: %P\nmax memory: %M 
+(bytes) swapped-out: %W  context-switchs: %c (involuntarily)\n%I number of inputs process\t%O number of outputs byt program\ncmd:\t%C" \
+bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes -CPUS 4
+
+
+Example without command(low spec) :
+gtime -f "elapsed time: %E\tCPU: %P\tmax memory: %M (bytes)\n" command options
+
+Example with command(low spec) :
+gtime -f "elapsed time: %E\tCPU: %P\tmax memory: %M (bytes)\n" \
+bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes -CPUS 4
+
+
+#freebee examples(with working genome test paths)
+/usr/bin/time -f "cpu secs for: %S user %S sys \telapsed time: %E CPU: %P\nmax memory: %M (bytes) 
+swapped-out: %W  context-switchs: %c (involuntarily)\n%I number of inputs process\t%O number of 
+outputs byt program\ncmd:\t%C" bash workflowmanager.sh -ref $HOME/pargenomes/genomes/England1.fna -genomedir $HOME/pargenomes/genomes -CPUS 16
+
+/usr/bin/time -f "elapsed time: %E\tCPU: %P\tmax memory: %M (bytes)\n" \
+bash workflowmanager.sh -ref $HOME/pargenomes/genomes/England1.fna -genomedir $HOME/pargenomes/genomes -CPUS 16
+
+
+
+
+
+
+
+
+
+
+
+
+
+

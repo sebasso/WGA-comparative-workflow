@@ -24,7 +24,7 @@ Options are the following: \
  -CPU <num_CPU> # optional, number of CPU's to use, if not specified it uses all available\n\
  -NJ # optional, calculate a neighbor joining tree\n\
  -vcf # optional, create a vcf file using the first genome specified in the -positions file as the reference genome\n\
- -all_annotations  # optional, annotate each locus exhaustively with all the annotations in any of the annotated genomes. Without this option it only provides the first annotation it comes to for a given locus, checking in the order genomes are listed in the -annotate file.\n\
+ -all_annotations  # optional, annotate each locus exhaustively with all the annotations in any of the annotated genomes. Without this option it only provides the first annotation it comes to for a given locusing in the order genomes are listed in the -annotate file.\n\
  -kchooser <boolean> if set, will use kchooser to calculate optimal k size for the genome collection.\n"
          exit
 endif
@@ -233,10 +233,6 @@ endif
 
 cp -f "$fasta_list" fasta_list
 
-#echo "Finished genomes for finding SNP positions:"
-#cat annotate_list
-#echo ""
-
 
 # Make lookup table of genome names and fsplit# files, and create fsplit# files by merging entries of multi-contig/multi-read input genomes.
 set count=0
@@ -408,7 +404,6 @@ foreach f (fsplit*)
 	#printf "genome: $genome  in Dir.$f\n"
 	if (-s Dir.$f/SNP.positions) then
 	    awk -F'\011' -v f=$f '{print $1 "\t" $2 "\t" $3  "\t" f "\t" $4}' Dir.$f/SNP.positions  >> all_SNPs_unsorted
-	    #cat Dir.$f/SNP.positions >> all_SNPs_unsorted
 	else
 	    awk -v genome=$genome '{print  $1 "\t" $2 "\tx\t" genome "\t" }' Dir.$f/SNPs >> all_SNPs_unsorted
 	endif
@@ -420,33 +415,46 @@ if (  $?SNPs_all ) then
 endif
 sort -u all_SNPs_unsorted >! all_SNPs_sorted
 $kSNP/number_SNPs_all3 all_SNPs_sorted
+
 $kSNP/rename_from_table3 all_SNPs_sorted_labelLoci fileName2genomeName SNPs_all
 
-set results_folder=$kSNP/result_folder
-printf "results_folder: $results_folder\n"
-if !( -e "$results_folder") then
-  mkdir "$results_folder"
-endif
 
+#SNP extraction as a background process so ML tree build can start without having to wait for this. output: kSNP_SNPs_POS_formatted.tsv
+#NB: tcsh doesnt support waiting of specific PIDs OR getting them from subprocess, exit codes also lack.
 
-#SNP extraction
-python $kSNP/kSNP_SNP_POS_extracter.py SNPs_all
+( python $kSNP/kSNP_SNP_POS_extracter.py SNPs_all ) &
+
 
 $kSNP/SNPs_all_2_fasta_matrix3 SNPs_all SNPs_all_matrix.fasta SNPs_all_matrix
 
 ## Building ML FastTree tree from all SNPs
 if ($?ML) then
- $kSNP/$os_path/FastTreeMP -nt -gtr -slow SNPs_all_matrix.fasta >!  tree.ML.tre
+ $kSNP/$os_path/FastTreeMP -nt -gtr -slow SNPs_all_matrix.fasta >!  ksnp.tree
  printf "ML\n" >> tree_list1
  printf "ML\n" >> tree_list2
 endif
 
-cp $dir/SNPs_all $results_folder
-cp $dir/tree.ML.tre $results_folder
-cp $dir/kSNP_SNPs_POS_formatted.tsv $results_folder
+# wait for kSNP_SNP_POS_extracter to finish if it has not. without it cp $dir/kSNP_SNPs_POS_formatted.tsv $results_folder would fail
+wait
+
+#all information available in SNPs_all is available in kSNP_SNPs_POS_formatted.tsv minus extra data of kmers
+cp $dir/ksnp.tree $kSNP
+cp $dir/kSNP_SNPs_POS_formatted.tsv $kSNP
+cp $dir/stderr $kSNP
+cp $dir/stdout $kSNP
 cd $kSNP
-rm -rf $dir
+rm -rf $dir/*
+mkdir $dir
+mv $kSNP/ksnp.tree $dir
+mv $kSNP/kSNP_SNPs_POS_formatted.tsv $dir
+mv $kSNP/stdout $dir
+mv $kSNP/stderr $dir
+
 #cleanup
 rm $kSNP/in_list
 rm $kSNP/annotate_genomes
 rm $kSNP/fasta_list
+
+
+
+

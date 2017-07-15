@@ -8,6 +8,9 @@ ksnp/ksnp_output/*
 ksnp/result_folder/*
 stdout.txt
 results/*
+timings/*
+!timings/gnu-time-examples.man
+
 
 
 #parsnp without compile files
@@ -47,7 +50,7 @@ parsnp/muscle/libMUSCLE/.deps/
 parsnp/muscle/libMUSCLE/libMUSCLE-3.7.la
 parsnp/muscle/libMUSCLE/muscle
 parsnp/muscle/configure
-
+parsnp/config.log
 
 parsnp/Makefile
 parsnp/Makefile.in

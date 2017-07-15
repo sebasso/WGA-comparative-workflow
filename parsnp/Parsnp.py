@@ -2,7 +2,6 @@ import os, sys, string, getopt, random,subprocess, time, glob,operator, math, da
 import signal
 import inspect
 from multiprocessing import *
-from shutil import copy
 
 reroot_tree = True #use --midpoint-reroot
 
@@ -296,6 +295,7 @@ if __name__ == "__main__":
     opts = []
     args = []
     executables = sys.argv[1]
+    sys.stderr.write(sys.argv[1])
     try:
         opts, args = getopt.getopt(sys.argv[2:], "hxved:C:F:D:i:g:m:MU:o:a:cln:p:P:q:r:Rsz:uV", ["help","xtrafast","verbose","extend","sequencedir","clusterD","DiagonalDiff","iniFile","genbank","mumlength","onlymumi","MUMi","outputDir","anchorlength","curated","layout","aligNmentprog","threads","max-partition-size","query","reference","nofiltreps","split","minclustersiZe","unaligned","version"])
     except getopt.GetoptError, err:
@@ -382,14 +382,7 @@ if __name__ == "__main__":
                 req_params["refgenome"] = 1
 
         elif o in ("-d","--sequenceDir"):
-            genomepath = currdir+"/genomes"
-            os.makedirs(genomepath)
-            sys.stderr.write("Putting genome files in :"+genomepath+"\n")
-            files = a.split(",")
-            for file in files:
-                copy(file,genomepath)
-
-            seqdir = genomepath
+            seqdir = a
 
             if not os.path.exists(seqdir):
                 sys.stderr.write( "ERROR: genome dir %s does not exist\n"%(seqdir))
@@ -991,15 +984,21 @@ if __name__ == "__main__":
         os.system("mv "+outputDir+os.sep+"parsnpAligner.xmfa "+outputDir+os.sep+"parsnp.xmfa")
     xmfafile = open(outputDir+os.sep+"parsnp.xmfa",'r')
 
-    pyfile = executables+"/parsnp/"+"parsnp_SNP_POS_extracter.py"
-    inputfile = os.getcwd()+"/Res-campy/parsnp.xmfa"
-    p = subprocess.Popen([sys.executable,pyfile,inputfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    fstdout,fstderr = p.communicate()
+    pyfile = executables+"/parsnp_SNP_POS_extracter.py"
+    inputfile = outputDir+"/parsnp.xmfa"
+    #sys.executable = python interpreter path
+    p = subprocess.Popen([sys.executable,pyfile,inputfile, outputDir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    """fstdout,fstderr = p.communicate() communicate is implicitly setting returncode after call but nicer with wait?
     sys.stderr.write("\n")
     sys.stderr.write(fstdout)
     sys.stderr.write("\n")
     sys.stderr.write(fstderr)
-    sys.stderr.write("\n")
+    sys.stderr.write("\n")"""
+    #p.returncode
+    returncode = p.wait()
+    if returncode > 0:
+        sys.stderr.write("parsnp_SNP_POS_extracter failed with exit code: "+str(returncode))
+        exit(1)
 
     file2hdr_dict = {}
     fileid = ""
@@ -1187,6 +1186,7 @@ if __name__ == "__main__":
 
         run_command("%s/harvest -q -i %s/parsnp.ggr -S "%(PARSNP_DIR,outputDir)+outputDir+os.sep+"parsnp.snps.mblocks")
 
+    #fasttreeOPTIONS HERE:(same as in ksnp)
     command = "%s/ft -nt -gtr -slow "%(PARSNP_DIR)+outputDir+os.sep+"parsnp.snps.mblocks > "+outputDir+os.sep+"parsnp.tree"
     print "-->Reconstructing core genome phylogeny.."
     run_command(command)
@@ -1271,8 +1271,8 @@ if __name__ == "__main__":
     if not VERBOSE and os.path.exists("%s/all_mumi.ini"%(outputDir)):
         os.remove("%s/all_mumi.ini"%(outputDir))
 
-    #if os.path.exists("%s/parsnp.snps.mblocks"%(outputDir)):
-     #   os.remove("%s/parsnp.snps.mblocks"%(outputDir))
+    if os.path.exists("%s/parsnp.snps.mblocks"%(outputDir)):
+        os.remove("%s/parsnp.snps.mblocks"%(outputDir))
      #commented out in order for galaxy to save contents of it, will be deleted anyway by the scheduler
 
     if not VERBOSE and os.path.exists("%s/all.mumi"%(outputDir)):
