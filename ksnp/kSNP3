@@ -9,6 +9,7 @@
 
 # Example:  kSNP3  -in example.fasta.list -outdir Test.out -k 13 -annotate example.annotate_list -min_frac 0.7
 
+
 if  ($#argv == 0)  then
          printf "Usage: kSNP3 <options>\
 Options are the following: \
@@ -28,7 +29,6 @@ Options are the following: \
  -kchooser <boolean> if set, will use kchooser to calculate optimal k size for the genome collection.\n"
          exit
 endif
-
 
 set DEBUG=0
 
@@ -113,7 +113,6 @@ end
 
 echo "Location of kSNP scripts: "
 echo "$kSNP"
-
 
 if ($?dir) then
     set dir = `$kSNP/add_paths3 "$dir" "$thisDir"`
@@ -242,12 +241,10 @@ printf "" >! fileName2genomeName
 while ($count < $num_seqs)
     set name=`awk -F'\011' -v c="$count" 'FNR==c+1 {print $2}' fasta_list`
     set file=`awk -F'\011' -v c="$count" 'FNR==c+1 {print $1}' fasta_list`
-    #printf "$count\t$name\t$file\n"
     $kSNP/merge_fasta_reads3  "$file" >! fsplit$count
     printf "fsplit$count\t$name\n" >> fileName2genomeName
     @ count ++
 end
-
 
 
 if ( $k <= 31  ) then
@@ -380,7 +377,7 @@ if (-s annotate_list) then
 	set f=`grep -w  $genome fileName2genomeName | awk '{print $1}'`
 	if ($test > 0 ) then
 	    set file=`grep -w  $genome fasta_list  | awk -F'\011' '{print $1}'`
-	    #printf "genome: $genome  in Dir.$f\n"
+	    printf "genome: $genome  in Dir.$f\n"
 	    awk -F'\011' '{print ">" $1 "_" $2 "\n" $3 }' Dir.$f/SNPs >! Dir.$f/SNPs.fasta
 	    printf "$kSNP/$os_path/mummer -maxmatch -l $k -b -c  Dir.$f/SNPs.fasta "'"'"$file"'"'" > Dir.$f/mummer.out\n" >> cmds_mummer
 	    printf "$kSNP/parse_mummer4kSNP3  Dir.$f/mummer.out  > Dir.$f/SNP.positions\n" >> cmds_parse_mummer
@@ -437,6 +434,7 @@ endif
 # wait for kSNP_SNP_POS_extracter to finish if it has not. without it cp $dir/kSNP_SNPs_POS_formatted.tsv $results_folder would fail
 wait
 
+
 #all information available in SNPs_all is available in kSNP_SNPs_POS_formatted.tsv minus extra data of kmers
 cp $dir/ksnp.tree $kSNP
 cp $dir/kSNP_SNPs_POS_formatted.tsv $kSNP
@@ -454,7 +452,3 @@ mv $kSNP/stderr $dir
 rm $kSNP/in_list
 rm $kSNP/annotate_genomes
 rm $kSNP/fasta_list
-
-
-
-

@@ -25,24 +25,17 @@
 ###    log structure
 # $currdir/"results"/$NOW-results"/stdout
 # $currdir/"results"/$NOW-results"/stderr
-# IF runned like this: bash workflowmanager.sh -ref ~Genomes/EEE_Florida91-4697.fasta -genomedir ~/Genomes > stdout 2> stderr
+# IF runned like this: bash workflowmanager.sh -ref ~/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Genomes > stdout 2> stderr
 # $currdir/"results"/$NOW-results"/$parsnp_output/parsnp.stdout
 # $currdir/"results"/$NOW-results"/$parsnp_output/parsnp.stderr
 # $currdir/"results"/$NOW-results"/$ksnp_output/ksnp.stdout
 # $currdir/"results"/$NOW-results"/$ksnp_output/ksnp.stderr
 
-exit_module(){
-  printf "\nExiting"
-  printf "["
-  for i in {1..70}
-  do
-    sleep 0.003
-    printf "#"
-  done
-  printf "]\n"
-  exit
-}
+source flows/cleanup.sh
 
+trap cleanup 1 2 3 9 15
+
+#trap cleanup EXIT
 
 printf "\n"
 printf "@args:\n"
@@ -103,7 +96,6 @@ parsnp_path=$currdir
 
 OS=`uname`
 printf "\nOS: $OS Cores: $CPUS\n"
-
 #Setting up platform dependent executables for parsnp, ksnp/ is modified to fit any nix* platform
 if [ "$OS" == "Darwin" ] || [ "$OS" == "Linux" ];
 then
@@ -113,7 +105,7 @@ else
   exit_module
 fi
 
-#### Galaxy inputformat: preprocessing of inputfiles
+#### preprocessing of inputfiles(ksnp ONLY((Galaxy inputformat legacy))
 #list files as one args as in galaxy framework when <param type=data multiple=true> , delimited set of inputfiles
 input_files=""
 for f in $genome_path/*
@@ -126,7 +118,7 @@ ksnp_output="$kSNP_path/ksnp_output"
 parsnp_output="$parsnp_path/parsnp_output"
 
 
-# setup logfiles
+# setup logfiles and output
 mkdir $ksnp_output
 mkdir $parsnp_output
 touch $ksnp_output/stderr
@@ -134,49 +126,46 @@ touch $ksnp_output/stdout
 touch $parsnp_output/stderr
 touch $parsnp_output/stdout
 
-# loading tools run defintions
-source tool-config.sh
+
+# loading tools run defintions(source runs the code in this shell)
+source flows/tool-config.sh
 # SPAWNING two subshells, each for doing a different WGA- each fork costs 2ms
 ## #   $! stores the PID of the LAST executed command
-run_ksnp
-ksnp_PID=$!
+pids=() #for printing
+tool_names=()
+counter=0
+for i in ${tool_array[@]};
+do
+   ( $i ) & # calls tool_methods
+   pids[counter]=$!
+   tool_names[counter]="$i"
+   let counter=counter+1
+done
 
-run_parsnp
-parsnp_PID=$!
-date
 
-printf "SHELL PID: $$ parsnp pid: $parsnp_PID ksnp pid: $ksnp_PID\n"
-printf "Waiting ..."
-
-
-wait $parsnp_PID
+printf "SHELL PID: $$\n"
+printf '%s\t' "${tool_names[@]}"
+printf '%s\t' "${pids[@]}"
 printf "\n"
-exit_status=$? #must be assigned or the variable will be lost after a simple if
-stop=0
-if [[ exit_status -ne 0 ]]; then
-  stop=1
-  >&2 printf "parsnp failed code: $exit_status \n"
-fi
-printf "parsnp done, waiting on ksnp\n"
+#jobs -l #printing subshells status + names, OBS verbose
+#printf "\n\n"
+
+# waiting on tool subshells
+counter=0
+for pid in ${pids[@]}; #alt `jobs -p`but fails if processes finished before this
+do
+    printf "waiting on: ${tool_names[$counter]} $pid"
+    wait $pid
+    exit_status=$?
+    if [[ $exit_status -ne 0 ]]; then
+      >&2 printf "\ntool: ${tool_names[$counter]} $pid failed with status: $exit_status \n"
+      kill_subshells
+    fi
+    printf "\tsuccess: ${tool_names[$counter]} $pid finished\n"
+    let counter=counter+1
+done
+
 date
-
-wait $ksnp_PID
-printf "\n"
-exit_status=$?
-if [[ exit_status -ne 0 ]]; then
-    stop=1
-    >&2 printf "ksnp failed code: $exit_status \n"
-    exit_module
-fi
-
-if [[ $stop -ne 0 ]]; then
-  >&2 printf "\n no comparison will be done due to the above problems\n"
-  exit_module
-fi
-printf "ksnp done\n"
-date
-
-
 
 ##### COMPARATORS #######
 ##### SNP comparison
@@ -196,7 +185,6 @@ printf "SNP comparison -> Done \n"
 # -> to get it back RUN: ./harvest_osx -i $run_specific/parsnp.ggr -X $run_specific/parsnp.xmfa #inside parsnp_folder
 rm $parsnp_output/parsnp.xmfa
 
-
 # Moving results to datefolder in results/
 main_result_folder=$currdir/"results"
 run_specific=$main_result_folder"/$NOW-results"
@@ -210,4 +198,6 @@ mv snps_stats.json $run_specific
 mv $ksnp_output $run_specific
 mv $parsnp_output $run_specific
 
-exit_module
+jobs -l
+jobs -p
+exit 0
