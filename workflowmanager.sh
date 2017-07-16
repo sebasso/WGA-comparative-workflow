@@ -2,7 +2,9 @@
 #intended for linux/macOS
 
 #USAGE: [-ref path_to_referencegenome] [-genomedir path_to_genome_directory] [-CPUS [num]]
-#example bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes
+#example
+#mbair: bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes
+
 
 #SBATCH --job-name=parsnpvsksnp-CPU-10-2GB
 #
@@ -20,19 +22,14 @@
 #SBATCH --output=slurmLogs/slurm%j.txt
 
 
-
-
-
-###    log structure 
+###    log structure
 # $currdir/"results"/$NOW-results"/stdout
 # $currdir/"results"/$NOW-results"/stderr
 # IF runned like this: bash workflowmanager.sh -ref ~Genomes/EEE_Florida91-4697.fasta -genomedir ~/Genomes > stdout 2> stderr
 # $currdir/"results"/$NOW-results"/$parsnp_output/parsnp.stdout
 # $currdir/"results"/$NOW-results"/$parsnp_output/parsnp.stderr
 # $currdir/"results"/$NOW-results"/$ksnp_output/ksnp.stdout
-# $currdir/"results"/$NOW-results"/$ksnp_output/ksnp.stderr  
-
-
+# $currdir/"results"/$NOW-results"/$ksnp_output/ksnp.stderr
 
 exit_module(){
   printf "\nExiting"
@@ -45,6 +42,7 @@ exit_module(){
   printf "]\n"
   exit
 }
+
 
 printf "\n"
 printf "@args:\n"
@@ -136,64 +134,20 @@ touch $ksnp_output/stdout
 touch $parsnp_output/stderr
 touch $parsnp_output/stdout
 
-
-
-
+# loading tools run defintions
+source tool-config.sh
 # SPAWNING two subshells, each for doing a different WGA- each fork costs 2ms
-(
-cd $kSNP_path
-./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS -kchooser "1" -ML -path $kSNP_path  > $ksnp_output/stdout  2> $ksnp_output/stderr
-) &
-
-#   $! stores the PID of the LAST executed command
+## #   $! stores the PID of the LAST executed command
+run_ksnp
 ksnp_PID=$!
 
-(
-cd $parsnp_path/bin
-# Does parsnp executeables exists && is  right OS exec -> ASSUMING other executables work
-parsnpcompiled=$(file parsnp | grep -o "Mach-O 64-bit executable x86_64")
-cd ../
-
-compiled=0
-# will compile if executable is wrong format or doesn't exist.
-if [ "$OS" == "Darwin" ];
-then
-    if [[ ! $parsnpcompiled == "Mach-O 64-bit executable x86_64" ]]; then
-      >&2 printf "parsnp NOT compiled or not compiled CORRECTLY!\n compiling ....."
-      bash build_parsnp_nix.sh
-      if [[ $? -ne 0 ]]; then
-        >&2 printf "Compilation FAILED, exit code: $?"
-        exit 1
-      fi
-      compiled=1
-    fi
-elif [ "$OS" == "Linux" ];
-then
-    if [[ ! $parsnpcompiled == "ELF 64-bit LSB executable" ]]; then
-      >&2 printf "parsnp NOT compiled or not compiled CORRECTLY!\n compiling ....."
-      bash build_parsnp_nix.sh
-      if [[ $? -ne 0 ]]; then
-        >&2 printf "Compilation FAILED, exit code: $?"
-        exit 1
-      fi
-      compiled=1
-    fi
-fi
-  printf "Parsnp path: $parsnp_path Compiled: $compiled (0=no,1=yes)\n" > $parsnp_output/stdout
-  python ./Parsnp.py $parsnp_path -r $ref -d $genome_path -p $CPUS -o $parsnp_output > $parsnp_output/stdout  2> $parsnp_output/stderr
-
-) &
-date
+run_parsnp
 parsnp_PID=$!
-cd ..
-
-
-# $? gives exit status of a process, used with wait - wait pid sets $? to the pids exit status
-# wait on specific subshells - parsnp always finished first(doesnt matter really wait gives the exit status of the pid it waiting for -> 
-#   if no pid it will wait for all subprocess and give the exit status of the lastly terminiated). wait PID gives more control.
+date
 
 printf "SHELL PID: $$ parsnp pid: $parsnp_PID ksnp pid: $ksnp_PID\n"
 printf "Waiting ..."
+
 
 wait $parsnp_PID
 printf "\n"
@@ -203,10 +157,8 @@ if [[ exit_status -ne 0 ]]; then
   stop=1
   >&2 printf "parsnp failed code: $exit_status \n"
 fi
-
 printf "parsnp done, waiting on ksnp\n"
 date
-
 
 wait $ksnp_PID
 printf "\n"
@@ -259,6 +211,3 @@ mv $ksnp_output $run_specific
 mv $parsnp_output $run_specific
 
 exit_module
-
-
-
