@@ -159,7 +159,7 @@ do
     exit_status=$?
     if [[ $exit_status -ne 0 ]]; then
       >&2 printf "\ntool: ${tool_names[$counter]} $pid failed with status: $exit_status \n"
-      kill_subshells
+      cleanup
     fi
     printf "\tsuccess: ${tool_names[$counter]} $pid finished\n"
     let counter=counter+1

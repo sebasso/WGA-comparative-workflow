@@ -22,8 +22,6 @@ parsnp/muscle/config.log
 parsnp/muscle/autom4te.cache
 parsnp/muscle/config/compile
 parsnp/muscle/INSTALL
-parsnp/muscle/Makefile
-parsnp/muscle/Makefile.in
 parsnp/muscle/aclocal.m4
 parsnp/muscle/config.status
 parsnp/muscle/config/config.guess
@@ -33,8 +31,6 @@ parsnp/muscle/config/install-sh
 parsnp/muscle/config/ltmain.sh
 parsnp/muscle/config/missing
 parsnp/muscle/libMUSCLE-3.7.pc
-parsnp/muscle/libMUSCLE/Makefile
-parsnp/muscle/libMUSCLE/Makefile.in
 parsnp/muscle/libtool
 parsnp/muscle/m4/libtool.m4
 parsnp/muscle/m4/ltoptions.m4
@@ -52,8 +48,6 @@ parsnp/muscle/libMUSCLE/muscle
 parsnp/muscle/configure
 parsnp/config.log
 
-parsnp/Makefile
-parsnp/Makefile.in
 parsnp/aclocal.m4
 parsnp/autom4te.cache/
 parsnp/bin/parsnp
@@ -64,9 +58,6 @@ parsnp/depcomp
 parsnp/install-sh
 parsnp/missing
 parsnp/src/.deps/
-parsnp/src
-parsnp/src/Makefile
-parsnp/src/Makefile.in
 parsnp/src/parsnp
 parsnp/src/parsnp-Converter.o
 parsnp/src/parsnp-LCB.o

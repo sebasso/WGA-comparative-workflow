@@ -25,6 +25,11 @@ do
       CPUS="$1"
       shift
       ;;
+			-runs)
+			shift
+			runs="$1"
+			shift
+			;;
       *)
       echo "unknown cmd: $1"
       exit_module
@@ -55,17 +60,22 @@ fi
 
 OS=`uname`
 printf "\nOS: $OS Cores: $CPUS\n"
-#Setting up platform dependent executables for parsnp, ksnp/ is modified to fit any nix* platform
-if [ "$OS" == "Darwin" ];
+
+opts=' -f "elapsed time: %E\tCPU: %P\tmax memory: %M (bytes)\n"'
+if [ $OS = "Darwin" ];
 then
   timer=`which gtime`
 	if [ -z $timer ]; then
 		printf "Mac doesnt have gnu-time support, cannot format output\n"
 		exit 1
 	fi
-elif [ "$OS" == "Linux" ];
+elif [ "$OS" = "Linux" ];
 then
-  timer=`which time`
+  timer=`which gtime`
+  if [ -z $timer ]; then
+    timer=`whereis time` # default timer without formatting option prints rusage
+    opts=' -l'
+  fi
 else
 	printf "\n OS not supported: $OS"
 	exit 1
@@ -76,20 +86,26 @@ NOW=$(date +"%Y-%b-%d-%H:%M")
 f1="timings/$NOW-resource-stats"
 touch $f1
 date
+printf "timer: $timer\n\n\n"
 for i in {1..$runs}
 do
 	printf "Run $i\n"
 	printf "$i: " >> $f1
 	touch timings/tmp$NOW
-	{ $timer -f "elapsed time: %E\tCPU: %P\tmax memory: %M (bytes)\n" \
-	 bash workflowmanager.sh -ref $ref -genomdir $genome_path -CPUS $CPUS\
-	 timings/tmp$NOW > /dev/null; }
-	tail -n 1 timings/tmp$NOW >> $f1
+	eval ${$timer$opts} bash workflowmanager.sh -ref $ref -genomdir $genome_path -CPUS $CPUS 2> timings/tmp$NOW > /dev/null
+	printf "\nexit status: $?\n"
+  tail -n 1 timings/tmp$NOW >> $f1
 	printf "$tmp" >> $f1
 	rm timings/tmp$NOW
 	date
 done
 
+
+#eval $timer$opts bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes
+printf "\nexit status: $?\n"
+
 printf "\n*********************************************************\
 \nJOB STATS available in:\n-->  $f1\
 \n*********************************************************\n"
+
+

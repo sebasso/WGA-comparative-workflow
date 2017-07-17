@@ -3,15 +3,14 @@
 compile_parsnp(){
   cd $parsnp_path/bin
   # Does parsnp executeables exists && is  right OS exec -> ASSUMING other executables work
-  parsnpcompiled=$(file parsnp | grep -o "Mach-O 64-bit executable x86_64")
-  cd ../
   compiled=0
   # compiles if executable is wrong format || doesn't exist.
   if [ "$OS" == "Darwin" ];
   then
+    parsnpcompiled=$(file parsnp | grep -o "Mach-O 64-bit executable x86_64")
       if [[ ! $parsnpcompiled == "Mach-O 64-bit executable x86_64" ]]; then
         >&2 printf "parsnp NOT compiled or not compiled CORRECTLY!\n compiling ....."
-        bash build_parsnp_nix.sh
+        bash build_parsnp_nix.sh 2&>1 build_parsnp.std
         if [[ $? -ne 0 ]]; then
           >&2 printf "Compilation FAILED, exit code: $?"
           exit 1
@@ -20,9 +19,10 @@ compile_parsnp(){
       fi
   elif [ "$OS" == "Linux" ];
   then
+    parsnpcompiled=$(file parsnp | grep -o "ELF 64-bit LSB executable")
       if [[ ! $parsnpcompiled == "ELF 64-bit LSB executable" ]]; then
-        >&2 printf "parsnp NOT compiled or not compiled CORRECTLY!\n compiling ....."
-        bash build_parsnp_nix.sh
+        >&2 printf "parsnp NOT compiled or not compiled CORRECTLY!\n compiling $parsnpcompiled....."
+        bash build_parsnp_nix.sh 2&>1 build_parsnp.std
         if [[ $? -ne 0 ]]; then
           >&2 printf "Compilation FAILED, exit code: $?"
           exit 1
@@ -30,6 +30,7 @@ compile_parsnp(){
         compiled=1
       fi
   fi
+  cd ../
 }
 
 
