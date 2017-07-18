@@ -52,6 +52,10 @@ if [ -z "$CPUS" ];
 then
   CPUS=4
 fi
+if [ -z "$runs" ];
+then
+  runs=4
+fi
 
 #bash workflowmanager.sh \
 #-ref /Users/sebastiansoberg/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta  \
@@ -61,7 +65,7 @@ fi
 OS=`uname`
 printf "\nOS: $OS Cores: $CPUS\n"
 
-opts=' -f "elapsed time: %E\tCPU: %P\tmax memory: %M (bytes)\n"'
+opts='"%E\t%P\t%e"'
 if [ $OS = "Darwin" ];
 then
   timer=`which gtime`
@@ -71,10 +75,9 @@ then
 	fi
 elif [ "$OS" = "Linux" ];
 then
-  timer=`which gtime`
+  timer=`which time`
   if [ -z $timer ]; then
     timer=`whereis time` # default timer without formatting option prints rusage
-    opts=' -l'
   fi
 else
 	printf "\n OS not supported: $OS"
@@ -87,12 +90,16 @@ f1="timings/$NOW-resource-stats"
 touch $f1
 date
 printf "timer: $timer\n\n\n"
+echo $opts
+printf "\ncmd:\n $timer -f $opts bash workflowmanager.sh -ref $ref -genomdir \
+  $genome_path -CPUS $CPUS\n"
+  printf "\n evaled\n"
 for i in {1..$runs}
 do
 	printf "Run $i\n"
-	printf "$i: " >> $f1
 	touch timings/tmp$NOW
-	eval ${$timer$opts} bash workflowmanager.sh -ref $ref -genomdir $genome_path -CPUS $CPUS 2> timings/tmp$NOW > /dev/null
+	$timer -f $opts bash workflowmanager.sh -ref $ref -genomedir \
+  $genome_path -CPUS $CPUS 2> timings/tmp$NOW > /dev/null
 	printf "\nexit status: $?\n"
   tail -n 1 timings/tmp$NOW >> $f1
 	printf "$tmp" >> $f1
@@ -103,7 +110,9 @@ done
 
 #eval $timer$opts bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes
 printf "\nexit status: $?\n"
-
+average=`cat $f1 | awk '{ total += $3 } END { print total/NR }'`
+printf "Average time elapsed: \n" >> $f1
+printf $average"\n" >> $f1
 printf "\n*********************************************************\
 \nJOB STATS available in:\n-->  $f1\
 \n*********************************************************\n"

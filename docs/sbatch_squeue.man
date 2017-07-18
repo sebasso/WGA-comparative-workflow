@@ -1,0 +1,9 @@
+
+#line in queue by pending jobs
+squeue -S S --states=PD | grep -n sebasso
+# by pending, configuring & running
+squeue -S S --states=PD,CF,R | grep -n sebasso
+
+#print expected start time:
+squeue -u sebasso -O starttime
+

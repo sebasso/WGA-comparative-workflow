@@ -45,8 +45,9 @@ run_ksnp(){
 
 run_parsnp(){
     compile_parsnp
+    cd $parsnp_path
     printf "Parsnp path: $parsnp_path Compiled: $compiled (0=no,1=yes)\n" > $parsnp_output/stdout
-    python ./Parsnp.py $parsnp_path -r $ref -d $genome_path -p $CPUS -o $parsnp_output \
+    python $parsnp_path/Parsnp.py $parsnp_path -r $ref -d $genome_path -p $CPUS -o $parsnp_output \
     > $parsnp_output/stdout  2> $parsnp_output/stderr
 }
 
