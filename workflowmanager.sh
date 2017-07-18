@@ -3,23 +3,23 @@
 
 #USAGE: [-ref path_to_referencegenome] [-genomedir path_to_genome_directory] [-CPUS [num]]
 #example
-#mbair: bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes
+#mbair: bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes -CPUS 10
 
-
-#SBATCH --job-name=parsnpvsksnp-CPU-10-2GB
+### SBATCH vars
+#SBATCH --job-name=campylobacter-parsnpvsksnp-CPU-10-2GB
 #
 # Project:
 #SBATCH --account=nn9305k
 #
 # Wall clock limit:
-#SBATCH --time=00:20:00
+#SBATCH --time=00:10:00
 #
 # Max memory usage:
-#SBATCH --mem-per-cpu=2GB
+#SBATCH --mem-per-cpu=1GB
 #
 # Number of cores:
 #SBATCH --cpus-per-task=10
-#SBATCH --output=slurmLogs/slurm%j.txt
+#SBATCH --output=slurmLogs/slurm%j.out
 
 
 ###    log structure
@@ -34,8 +34,6 @@
 source flows/cleanup.sh
 
 trap cleanup 1 2 3 9 15
-
-#trap cleanup EXIT
 
 printf "\n"
 printf "@args:\n"
@@ -60,6 +58,11 @@ do
       CPUS="$1"
       shift
       ;;
+      -abel)
+      shift
+      abel="$1"
+      shift
+      ;;
       *)
       echo "unknown cmd: $1"
       exit_module
@@ -67,7 +70,6 @@ do
       ;;
   esac
 done
-
 
 #checking required options and type
 if [ -z "$ref" ] && [ ! -f "$ref" ];
@@ -81,11 +83,14 @@ then
   printf "Genome directory genome must be supplied\n -genome_dir path_to_genome_directory"
   exit_module
 fi
-
 #optional option - no paramater set default=4
 if [ -z "$CPUS" ];
 then
   CPUS=4
+fi
+
+if [! -z "$abel" ];
+  source flows/abel.sh
 fi
 
 #local variables setup
@@ -198,6 +203,5 @@ mv snps_stats.json $run_specific
 mv $ksnp_output $run_specific
 mv $parsnp_output $run_specific
 
-jobs -l
-jobs -p
+
 exit 0

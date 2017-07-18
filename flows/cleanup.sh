@@ -20,7 +20,7 @@ kill_subshells(){
     ps -o pid,ppid | grep $pid | tail -n+2 | awk -F  " " '{print $1}' | xargs kill -15
     kill -15 $pid
   done
-  printf " \n\nKilling done\n"
+  printf " Killing done\n"
   printf " ----------------------------------- \n"
   exit_module
 }
@@ -28,7 +28,20 @@ kill_subshells(){
 
 cleanup(){
   printf "cleaning up: \n"
+  exit_status=$?
   printf "exit status: $?\n"
+  if [[ $exit_status -ne 0 ]]; then
+    #save stdout/stderr
+    mkdir $parsnp_path/$NOW/logs
+    mkdir $kSNP_path/$NOW/logs
+
+    mv $parsnp_output/stderr  $parsnp_path/$NOW/logs
+    mv $parsnp_output/stdout  $parsnp_path/$NOW/logs
+
+    mv $ksnp_output/stderr $kSNP_path/$NOW/logs
+    mv $ksnp_output/stdout $kSNP_path/$NOW/logs
+  fi
+
   if [ ! -z $run_specific ]; then
     rm -rf $run_specific
   fi
