@@ -24,7 +24,6 @@ def execute_kChooser_on_all(in_file,path,os_path):
 	sys.stderr.write("\n")
 	sys.stderr.write("path:\n"+path)
 	sys.stderr.write("\nos_path:\n"+os_path)
-	#sys.stderr.write()
 	sys.stderr.write("\n")
 	for file in filepaths:
 		proc = subprocess.Popen(['perl', perl_exec, file, path, os_path], stdout=subprocess.PIPE)

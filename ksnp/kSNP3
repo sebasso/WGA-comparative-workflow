@@ -154,6 +154,9 @@ printf "\nos_path:\n$os_path \n"
 if ($?kchooser) then
   if ($kchooser == "1") then
     set k=`python $kSNP/Kchooser-allFiles.py in_list $kSNP $os_path`
+    if ($?k) then
+      set k=13
+    endif
   endif
 else
   printf "Kchooser variable is undefined\n"

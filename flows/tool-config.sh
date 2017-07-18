@@ -5,7 +5,6 @@ compile_parsnp(){
   # Does parsnp executeables exists && is  right OS exec -> ASSUMING other executables work
   compiled=0
   # compiles if executable is wrong format || doesn't exist.
-  ls -l
   if [ "$OS" == "Darwin" ];
   then
     parsnpcompiled=$(file parsnp | grep -o "Mach-O 64-bit executable x86_64")
