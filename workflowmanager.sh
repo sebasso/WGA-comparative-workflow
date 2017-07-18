@@ -89,16 +89,17 @@ then
   CPUS=4
 fi
 
-if [! -z "$abel" ];
+if [ ! -z "$abel" ];
+then
   source flows/abel.sh
+else
+  NOW=$(date +"%Y-%b-%d-%H:%M")
 fi
 
 #local variables setup
-NOW=$(date +"%Y-%b-%d-%H:%M")
 currdir=`pwd`
 kSNP_path=$currdir/ksnp
 parsnp_path=$currdir
-
 OS=`uname`
 printf "\nOS: $OS Cores: $CPUS\n"
 #Setting up platform dependent executables for parsnp, ksnp/ is modified to fit any nix* platform
@@ -119,13 +120,13 @@ do
 done
 input_files=${input_files:1} # remove first ,
 
-ksnp_output="$kSNP_path/ksnp_output"
-parsnp_output="$parsnp_path/parsnp_output"
+ksnp_output="$kSNP_path/ksnp_output/$NOW"
+parsnp_output="$parsnp_path/parsnp_output/$NOW"
 
 
 # setup logfiles and output
-mkdir $ksnp_output
-mkdir $parsnp_output
+mkdir -p $ksnp_output
+mkdir -p $parsnp_output
 touch $ksnp_output/stderr
 touch $ksnp_output/stdout
 touch $parsnp_output/stderr
@@ -134,14 +135,13 @@ touch $parsnp_output/stdout
 
 # loading tools run defintions(source runs the code in this shell)
 source flows/tool-config.sh
-# SPAWNING two subshells, each for doing a different WGA- each fork costs 2ms
-## #   $! stores the PID of the LAST executed command
+# SPAWNING two subshells, each for doing a different WGA- each fork costs 2ms ->  $! stores the PID of the LAST executed command
 pids=() #for printing
 tool_names=()
 counter=0
 for i in ${tool_array[@]};
 do
-   ( $i ) & # calls tool_methods
+   ( $i ) &  #calls tool_methods as a subshell -> enables tools parallelism
    pids[counter]=$!
    tool_names[counter]="$i"
    let counter=counter+1
@@ -153,7 +153,6 @@ printf '%s\t' "${tool_names[@]}"
 printf '%s\t' "${pids[@]}"
 printf "\n"
 #jobs -l #printing subshells status + names, OBS verbose
-#printf "\n\n"
 
 # waiting on tool subshells
 counter=0
@@ -177,7 +176,7 @@ date
 printf "Genome alignment done\n"
 python $currdir/snp_comparator.py $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_SNPs_POS_formatted.tsv
 printf "SNP comparison -> Done \n"
-
+date
 ### ML tree comparison
 #not implemented -> when implemented run both as subshells with a wait
 
@@ -200,8 +199,11 @@ fi
 
 mkdir $run_specific
 mv snps_stats.json $run_specific
-mv $ksnp_output $run_specific
-mv $parsnp_output $run_specific
+mv $ksnp_output/ksnp.tree $run_specific
+mv $ksnp_output/kSNP_SNPs_POS_formatted.tsv $run_specific
 
+mv $parsnp_output/parsnp.tree $run_specific
+mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $run_specific
 
+date
 exit 0

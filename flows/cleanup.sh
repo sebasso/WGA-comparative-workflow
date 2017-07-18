@@ -8,28 +8,27 @@ exit_module(){
 
 
 kill_subshells(){
-  printf " ----------------------------------- \n"
-  printf " Killing subshells\n\n"
-  printf '%s\t' "${tool_names[@]}"
-  printf '%s\t' "${pids[@]}"
-  printf "\n"
+  >&2 printf " ----------------------------------- \n"
+  >&2 printf '%s\t' "${tool_names[@]}"
+  >&2 printf '%s\t' "${pids[@]}"
+  >&2 printf "\n"
   for pid in ${pids[@]};
   do
-    printf "killing pid: $pid\n"
+    >&2 printf "killing pid: $pid\n"
     #kill all subprocesses of tools
     ps -o pid,ppid | grep $pid | tail -n+2 | awk -F  " " '{print $1}' | xargs kill -15
     kill -15 $pid
   done
-  printf " Killing done\n"
-  printf " ----------------------------------- \n"
+  >&2 printf " Killing done\n"
+  >&2 printf " ----------------------------------- \n"
   exit_module
 }
 
 
 cleanup(){
-  printf "cleaning up: \n"
+  >&2 printf "cleaning up: \n"
   exit_status=$?
-  printf "exit status: $?\n"
+  >&2 printf "exit status: $?\n"
   if [[ $exit_status -ne 0 ]]; then
     #save stdout/stderr
     mkdir $parsnp_path/$NOW/logs
