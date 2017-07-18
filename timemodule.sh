@@ -71,13 +71,17 @@ then
   timer=`which gtime`
 	if [ -z $timer ]; then
 		printf "Mac doesnt have gnu-time support, cannot format output\n"
+    timer=`whereis time` # default timer without formatting option prints rusage
 		exit 1
 	fi
 elif [ "$OS" = "Linux" ];
 then
   timer=`which time`
   if [ -z $timer ]; then
-    timer=`whereis time` # default timer without formatting option prints rusage
+      printf "unkown timer exiting."
+      exit 1
+  else
+    timer=/usr/bin/time
   fi
 else
 	printf "\n OS not supported: $OS"
@@ -89,11 +93,6 @@ NOW=$(date +"%Y-%b-%d-%H:%M")
 f1="timings/$NOW-resource-stats"
 touch $f1
 date
-printf "timer: $timer\n\n\n"
-echo $opts
-printf "\ncmd:\n $timer -f $opts bash workflowmanager.sh -ref $ref -genomdir \
-  $genome_path -CPUS $CPUS\n"
-  printf "\n evaled\n"
 for i in {1..$runs}
 do
 	printf "Run $i\n"
