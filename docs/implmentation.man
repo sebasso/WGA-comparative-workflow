@@ -1,0 +1,7 @@
+PATH=/cluster/home/sebasso/.local/lib/python2.7/site-packages:$PATH
+
+or module load python2.7
+pip install --user numpy
+for abel
+
+
