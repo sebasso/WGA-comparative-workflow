@@ -14,4 +14,3 @@ bash workflowmanager.sh -ref /usit/abel/u1/sebasso/ksnp_small/EEE_Florida91-4697
 
 LOCAL:
 bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes -CPUS 4
-

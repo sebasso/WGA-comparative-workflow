@@ -1,0 +1,18 @@
+slurm dependencies:
+#locally:
+module load python2.7 # default loads python 2.7.10
+therefore local python must be 2.7.10 when installing packages:
+python2.7.10 -> https://gist.github.com/cspanring/6345eaaeb7d052b4587af5f64f268fdc
+download as python.rb
+brew install path_to_/python.rb
+pip install --user numpy
+
+#interactive:
+qlogin --account=nn9305k --ntasks=1
+pip install --user numpy
+module load python2.7
+
+make it aware of numpy:
+export PATH=/cluster/home/sebasso/.local/lib/python2.7/site-packages:$PATH
+#
+then module load python2.7 works #in abel.sh

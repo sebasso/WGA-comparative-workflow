@@ -11,7 +11,7 @@ OS=`uname`
 if [ "$OS" == "Darwin" ];
 then
 printf "\nOS: $OS\n"
-#gccpath=`which gcc`
+gcc=`which gcc`
 printf "\ngccpath: \n$gcc\n"
 exec=`echo $gcc | grep -o /usr/local/bin/gcc-'[0-9]'."[0-9]"`
 printf "exec:\n $exec\n"
