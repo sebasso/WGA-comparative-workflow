@@ -54,7 +54,12 @@ run_ksnp(){
 #fetching all tool definitions
 #typeset -F gives function names only, -f gives whole function of functions
 all_tools_functions="typeset -F | grep -o '\<run_.*\>'"
+declare -a ordered
 declare -a tool_array
 while read -r line; do
-   tool_array+=("$line")
+   ordered+=("$line")
 done <<< "`eval $all_tools_functions`"  # inputs file to be read line by line
+
+for (( idx=${#ordered[@]}-1 ; idx>=0 ; idx-- )) ; do
+  tool_array+=(${ordered[idx]})
+done

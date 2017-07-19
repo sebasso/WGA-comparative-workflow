@@ -1,6 +1,6 @@
 ABEL:
 ecoli run:
-sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/mastertools/Parsnp-Linux64-v1.2/refs/NC_002128.1-ecoli.fna \
+sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/mastertools/Parsnp-Linux64-v1.2/refs/BA000007.2-coli-O157-H7.fasta \
 -genomedir /work/projects/nn9305k/compgenomes/rawdata/ecoli_asms -CPUS 20 -abel 1
 
 comp run:

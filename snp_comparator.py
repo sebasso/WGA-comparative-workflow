@@ -52,14 +52,14 @@ import json
 def readfiles(files):
     all_files = []
     tool_names = []
-    
+
     for f in files:
         with open(f,"r") as f:
             tmp = f.readlines()
             filename = tmp[0]
             all_files.append(tmp[1:])
             tool_names.append(filename)
-    
+
     sys.stdout.write("Comparing tools: "+str(tool_names)+"\n")
 
     return all_files, tool_names
@@ -103,11 +103,6 @@ def count_snps_per_genome(snp_lists_files):
 
 def compare_snps(SNP_files):
     files = SNP_files
-    numfiles = len(files)
-
-    if numfiles <= 1:
-        sys.stderr.write("snp_comparator requires a minimum of 2 formatted SNP lists with their respective position and file name")
-        exit(1)
 
     snp_lists_files, tool_names = readfiles(files)
 
@@ -121,9 +116,9 @@ def compare_snps(SNP_files):
     for i in xrange(0,len(snp_lists_files)):
         stats["total_snps"].append(len(snp_lists_files[i]))
 
-    
+
     stats["SNPs_per_genome"] = count_snps_per_genome(snp_lists_files)
-    
+
     SNPs_loci, SNPs_loci_filename = find_SNPs_in_same_position(snp_lists_files)
     stats["same_loci_snps"] = SNPs_loci
     stats["same_loci_filename"] = SNPs_loci_filename
@@ -132,7 +127,7 @@ def compare_snps(SNP_files):
 
     with open("snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
         f.write(r)
-    
+
 
     ### Printing stats
     #for entry, value in stats.items():
@@ -147,4 +142,8 @@ def compare_snps(SNP_files):
     2. parsnp -> core genome always same amount of snps?
     """
 if __name__ == '__main__':
-    compare_snps(sys.argv[1:])
+    files = sys.argv[1:]
+    if len(files) <= 1:
+        sys.stderr.write("snp_comparator requires a minimum of 2 formatted SNP lists with their respective position and file name")
+        exit(1)
+    compare_snps(files)

@@ -351,10 +351,10 @@ if __name__ == "__main__":
             VERBOSE = True
         if o in ("-V","--version"):
             version()
-            sys.exit(0)
+            sys.exit(1)
         elif o in ("-h", "--help"):
             usage()
-            sys.exit(0)
+            sys.exit(1)
         elif o in ("-R","--filtreps"):
             print "WARNING: -R option is no longer supported, ignoring. Please see harvest.readthedocs.org for bed filtering w/ harvesttools"
             filtreps = False
@@ -549,11 +549,10 @@ if __name__ == "__main__":
         sortem = False
 
 
-
     autopick_ref = False
     if (len(ref) == 0 and len(query) == 0) or len(seqdir) == "":
         sys.stderr.write( ERROR_RED+"ERROR: no seqs provided, yet required. exit!\n"+ENDC)
-        sys.exit(0)
+        sys.exit(1)
     elif len(ref) == 0 and len(query) != 0:
         sys.stderr.write( WARNING_YELLOW+"WARNING: no reference genome specified, going to autopick from %s as closest to %s\n"%(seqdir, query)+ENDC)
         autopick_ref = True
@@ -638,9 +637,9 @@ if __name__ == "__main__":
                 sys.exit(1)
             reflen = len(data)
         ff.close()
+
     for file in files:
        nameok = True
-
        for char in special_chars:
           if char in file:
               #print "WARNING: File %s contains a non-supported special character (%s) in file name. Please remove if you'd like to include. For best practices see: http://support.apple.com/en-us/HT202808"%(file,char)
@@ -648,11 +647,11 @@ if __name__ == "__main__":
               break
        if not nameok:
            continue
+
        if file[0] != "." and file[-1] != "~":
             ff = open(seqdir+os.sep+file,'r')
             hdr = ff.readline()
             if hdr[0] == ">":
-
                 data = []
                 totlen = 0
                 for line in ff.xreadlines():
@@ -673,7 +672,6 @@ if __name__ == "__main__":
                 sizediff = float(reflen)/float(totlen)
                 if sizediff <= 0.6 or sizediff >= 1.4:
                     continue
-
                 fnafiles.append(file)
                 fnaf_sizes[file] = totlen#len(data)
             ff.close()
@@ -762,7 +760,7 @@ if __name__ == "__main__":
         if len(fnafiles) < 1 or ref == "":
             sys.stderr.write( "Parsnp requires 2 or more genomes to run, exiting\n")
             print fnafiles, ref
-            sys.exit(0)
+            sys.exit(1)
 
         file_string = ""
         cnt = 1
@@ -905,7 +903,7 @@ if __name__ == "__main__":
     if not inifile_exists:
         if len(finalfiles) < 1 or ref == "":
             sys.stderr.write( "ERROR: Parsnp requires 2 or more genomes to run, exiting\n")
-            sys.exit(0)
+            sys.exit(1)
 
         file_string = ""
         cnt = 1

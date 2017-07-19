@@ -29,6 +29,8 @@ cleanup(){
   >&2 printf "cleaning up: \n"
   exit_status=$?
   >&2 printf "exit status: $?\n"
+  #remove subprocesses from directories first or rm can fail if subprocesses is in an writing phase
+  kill_subshells
   if [[ $exit_status -ne 0 ]]; then
     #save stdout/stderr
     mkdir $parsnp_path/$NOW/logs
@@ -45,6 +47,10 @@ cleanup(){
     rm -rf $run_specific
   fi
 
+  cleanup_junk
+}
+
+cleanup_junk(){
   if [ -d $parsnp_output ]; then
     rm -rf $parsnp_output
   fi
@@ -61,6 +67,4 @@ cleanup(){
   if [ -f $kSNP_path/in_list ]; then
    rm $kSNP_path/in_list
   fi
-
-  kill_subshells
 }
