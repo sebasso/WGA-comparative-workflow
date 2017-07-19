@@ -206,4 +206,5 @@ mv $parsnp_output/parsnp.tree $run_specific
 mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $run_specific
 
 date
+cleanup
 exit 0
