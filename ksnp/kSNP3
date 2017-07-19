@@ -63,6 +63,16 @@ while ($#argv > 0)
       shift
       set fasta_list="$argv[1]"
       set words = `echo $fasta_list:q | sed 's/,/ /g'`
+      #if cleanup fails for some odd reason, remove these files. If not removed new genomes are added to the alignment which will take forever and ruin the result
+      if ( -f in_list) then
+        rm in_list
+      endif
+      if ( -f annotate_genomes) then
+        rm annotate_genomes
+      endif
+      if ( -f fasta_list) then
+        rm fasta_list
+      endif
       touch in_list
       touch annotate_genomes
       foreach word ($words)
