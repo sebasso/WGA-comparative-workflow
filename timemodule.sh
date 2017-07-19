@@ -78,7 +78,7 @@ elif [ "$OS" = "Linux" ];
 then
   timer=`which time`
   if [ -z $timer ]; then
-      printf "unkown timer exiting."
+      printf "unknown timer exiting."
       exit 1
   else
     timer=/usr/bin/time
@@ -115,5 +115,3 @@ printf $average"\n" >> $f1
 printf "\n*********************************************************\
 \nJOB STATS available in:\n-->  $f1\
 \n*********************************************************\n"
-
-

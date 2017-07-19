@@ -1,9 +1,11 @@
 ABEL:
 ecoli run:
-sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/mastertools/Parsnp-Linux64-v1.2/refs/NC_002128.1-ecoli.fna -genomedir /work/projects/nn9305k/compgenomes/rawdata/ecoli_asms -CPUS 20 -abel 1
+sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/mastertools/Parsnp-Linux64-v1.2/refs/NC_002128.1-ecoli.fna \
+-genomedir /work/projects/nn9305k/compgenomes/rawdata/ecoli_asms -CPUS 20 -abel 1
 
 comp run:
-sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/mastertools/Parsnp-Linux64-v1.2/refs/NC_002163-comp.fna -genomedir /work/projects/nn9305k/compgenomes/rawdata/campy_asms -CPUS 20 -abel 1
+sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/mastertools/Parsnp-Linux64-v1.2/refs/NC_002163-comp.fna -genomedir \
+/work/projects/nn9305k/compgenomes/rawdata/campy_asms -CPUS 20 -abel 1
 
 freebee:(parsnp viruses testdata)
 bash workflowmanager.sh -ref /usit/abel/u1/sebasso/pargenomes/genomes/England1.fna -genomedir /usit/abel/u1/sebasso/pargenomes/genomes -CPUS 8

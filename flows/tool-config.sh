@@ -35,20 +35,19 @@ compile_parsnp(){
 
 
 # tool runs definitions:
-
-run_ksnp(){
-  cd $kSNP_path
-  #if previous run failed, multiple entries in these files will give problems, (tsch doesnt support functions, or trap clean_function EXIT should be used)
-  ./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS \
-  -kchooser "1" -ML -path $kSNP_path  > $ksnp_output/stdout  2> $ksnp_output/stderr
-}
-
 run_parsnp(){
     compile_parsnp
     cd $parsnp_path
     printf "Parsnp path: $parsnp_path Compiled: $compiled (0=no,1=yes)\n" > $parsnp_output/stdout
     python $parsnp_path/Parsnp.py $parsnp_path -r $ref -d $genome_path -p $CPUS -o $parsnp_output \
     > $parsnp_output/stdout  2> $parsnp_output/stderr
+}
+
+run_ksnp(){
+  cd $kSNP_path
+  #if previous run failed, multiple entries in these files will give problems, (tsch doesnt support functions, or trap clean_function EXIT should be used)
+  ./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU $CPUS \
+  -kchooser "1" -ML -path $kSNP_path  > $ksnp_output/stdout  2> $ksnp_output/stderr
 }
 
 
