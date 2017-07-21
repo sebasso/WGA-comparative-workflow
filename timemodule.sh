@@ -91,6 +91,9 @@ fi
 printf "runs: $runs\n"
 NOW=$(date +"%Y-%b-%d-%H:%M")
 f1="timings/$NOW-resource-stats"
+if [ ! -d "timings" ]; then
+  mkdir timings
+fi
 touch $f1
 date
 for i in {1..$runs}
@@ -99,7 +102,7 @@ do
 	touch timings/tmp$NOW
 	$timer -f $opts bash workflowmanager.sh -ref $ref -genomedir \
   $genome_path -CPUS $CPUS 2> timings/tmp$NOW > /dev/null
-	printf "\nexit status: $?\n"
+	printf "exit status: $?\n"
   tail -n 1 timings/tmp$NOW >> $f1
 	printf "$tmp" >> $f1
 	rm timings/tmp$NOW

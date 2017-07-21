@@ -12,14 +12,18 @@
 #SBATCH --account=nn9305k
 #
 # Wall clock limit:
-#SBATCH --time=00:10:00
+#SBATCH --time=02:20:00
 #
 # Max memory usage:
-#SBATCH --mem-per-cpu=1GB
+#SBATCH --mem-per-cpu=2GB
 #
 # Number of cores:
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=20
 #SBATCH --output=slurmLogs/slurm%j.out
+# Notifications
+#SBATCH --mail-type=END,FAIL,BEGIN # notifications for job done & fail & started
+#SBATCH --mail-user=sebasso@ifi.uio.no
+
 
 
 ###    log structure
@@ -206,5 +210,5 @@ mv $parsnp_output/parsnp.tree $run_specific
 mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $run_specific
 
 date
-cleanup_on_success
+cleanup_junk
 exit 0
