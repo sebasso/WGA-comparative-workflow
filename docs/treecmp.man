@@ -1,0 +1,40 @@
+software:
+http://kaims.eti.pg.gda.pl/~dambo/treecmp/
+
+article:
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3422086/
+
+metrics explained:(only unrooted)
+split = Each internal edge of a binary phyloge- netic tree divides the set of considered species into two 			related groups.
+example:
+	Two  splits can then be compared using an arbitrary metric h defined on a set of splits. The metric h quantifies the level of dissimilarity of two arbitrary splits.
+
+SPLIT based distances:
+o ms – the Matching Split distance (Bogdanowicz and Giaro 2012)
+	MS distance is more sensitive than RF and is resistant to displacement of a small number of leaves, discussed in detail in Section 5.
+	vs: "k times Theorem 5.3 or 5.4 we obtain that relocating a constant number k of leaves in the trees can 		change their MS distance by a value of the order OðnÞ, which is asymptotically small in comparison to 		the maximal possible distance in T n for MS, equal to  ðn2Þ (for the proof, see Section 6). Therefore, 		for large phylogenies, the relocation of a bounded number of leaves does not cause significant changes 		to MS. This is the fundamental advantage of MS over the RF metric."
+
+o rf – the Robinson-Foulds distance (Robinson and Foulds 1981)
+	-> number of splits. NOT resistant to displacement of small number of leaves!
+		counts all splits not included in the other one
+	RF do not distinguish between rearrangements that aect the relationships between many leaves and rearrangements that affect only a few. since its based on "transformation operations". 
+	ref: http://www.maths.otago.ac.nz/~dbryant/Papers/00Distance.pdf
+	rf example:
+	http://biomcmc.blogspot.no/2013/02/the-difference-between-rf-and-nni.html
+o pd – the path difference distance (Steel and Penny 1993) also called "cladistic difference" and "nodal distance"
+	->
+	def;  the square root of 2(PW ? Qt>])2, where Pt] and QtJ are
+ 	the path lengths between pairs of taxa /and ; on the trees Tx and T2.
+ 	;. The metric measures the Euclidean distance between the path
+ 	lengths for all pairs of taxa (populations or languages) on each tr
+
+o qt – the quartet distance (Estabrook 1985)
+	-> 
+	def: "The quartet distance between two unrooted evolutionary trees is the number of quartet topology differences between the two trees, where a quartet topology is the topological subtree induced by four species."
+	"Bryant et al. in [6] argue that the quartet metric has several
+	attractive properties and does not suffer from drawbacks of other distance measures,
+	such as measures based on transformation operations (e.g. the subtree transfer distance)
+	not distinguishing between transformations that affect a large number of leaves and
+	transformations that affect a small number of leaves."
+
+

@@ -58,38 +58,67 @@ def readfiles(files):
             tmp = f.readlines()
             filename = tmp[0]
             all_files.append(tmp[1:])
-            tool_names.append(filename)
+            tool_names.append(filename.rstrip())
 
     sys.stdout.write("Comparing tools: "+str(tool_names)+"\n")
 
     return all_files, tool_names
 
-def find_SNPs_in_same_position(files):
+
+def find_SNPs_in_same_position(files, tool_names):
     comparisons = len(files)-1
 
-    SNPs_same_position = []
-    SNPs_same_position_and_file = []
+    SNPs_same_position = {}
 
     if len(files)>2:
         #multiple loop
         print "not implemented yet"
         exit(0)
     else:
+        print "\nstat check\n"
         for lines in files[0]:
             for lines2 in files[1]:
+                same_file = 0
                 l1 = lines.split("\t")
                 l2 = lines2.split("\t")
-                if  int(l1[1]) == int(l2[1]):
-                    SNPs_same_position.append(l1[0])
-                    SNPs_same_position.append(l2[0])
-                    if l1[0] == l2[0]:
-                        SNPs_same_position_and_file.append(l1[0])
-                        SNPs_same_position_and_file.append(l2[0])
+                key = int(l1[1])
+                if  key == int(l2[1]):
+
+                    if key in SNPs_same_position: # key= position in genome
+                        if l1[0] == l2[0]:
+                            SNPs_same_position[key][tool_names[0]][l1[0]] = []
+                            SNPs_same_position[key][tool_names[0]][l1[0]].append(l1[2])
+                            SNPs_same_position[key][tool_names[0]][l1[0]].append("common\t"+tool_names[1])
+                            SNPs_same_position[key][tool_names[1]][l2[0]] = []
+                            SNPs_same_position[key][tool_names[1]][l2[0]].append(l2[2])
+                            SNPs_same_position[key][tool_names[1]][l2[0]].append("common\t"+tool_names[0])
+                        else:
+                            SNPs_same_position[key][tool_names[0]][l1[0]] = l1[2]
+                            SNPs_same_position[key][tool_names[1]][l2[0]] = l2[2]
+
+                    else:
+                        SNPs_same_position[key] = {}
+                        SNPs_same_position[key][tool_names[0]] = {}
+                        SNPs_same_position[key][tool_names[1]] = {}
+                        if l1[0] == l2[0]:#TODO, handle this in js?
+                            SNPs_same_position[key][tool_names[0]][l1[0]] = []
+                            SNPs_same_position[key][tool_names[0]][l1[0]].append(l1[2])
+                            SNPs_same_position[key][tool_names[0]][l1[0]].append("common\t"+tool_names[1])
+                            SNPs_same_position[key][tool_names[1]][l2[0]] = []
+                            SNPs_same_position[key][tool_names[1]][l2[0]].append(l2[2])
+                            SNPs_same_position[key][tool_names[1]][l2[0]].append("common\t"+tool_names[0])
+
+                        else:
+                            SNPs_same_position[key][tool_names[0]][l1[0]] = l1[2]
+                            SNPs_same_position[key][tool_names[1]][l2[0]] = l2[2]
+
+                    # same filename && position
+
                 elif int(l1[1]) > int(l2[1]):
                     break
 
-    return (SNPs_same_position, SNPs_same_position_and_file)
-
+    print "\nstat check done ---->\n"
+    return SNPs_same_position
 
 def count_snps_per_genome(snp_lists_files):
     SNPs_per_genome = []
@@ -101,13 +130,12 @@ def count_snps_per_genome(snp_lists_files):
     return SNPs_per_genome
 
 
-def compare_snps(SNP_files):
+def compare_snps(outputdir, SNP_files):
     files = SNP_files
 
     snp_lists_files, tool_names = readfiles(files)
 
     stats = {}
-
     stats["tool_names"] = tool_names
     stats["total_snps"] = []
 
@@ -116,18 +144,15 @@ def compare_snps(SNP_files):
     for i in xrange(0,len(snp_lists_files)):
         stats["total_snps"].append(len(snp_lists_files[i]))
 
-
     stats["SNPs_per_genome"] = count_snps_per_genome(snp_lists_files)
 
-    SNPs_loci, SNPs_loci_filename = find_SNPs_in_same_position(snp_lists_files)
+    SNPs_loci = find_SNPs_in_same_position(snp_lists_files, tool_names)
     stats["same_loci_snps"] = SNPs_loci
-    stats["same_loci_filename"] = SNPs_loci_filename
 
     r = json.dumps(stats, indent=4, encoding="utf-8", sort_keys=True)
 
-    with open("snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
+    with open(outputdir+"/snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
         f.write(r)
-
 
     ### Printing stats
     #for entry, value in stats.items():
@@ -141,9 +166,11 @@ def compare_snps(SNP_files):
     1. parsnp doesnt compare all fasta files, will be different output there
     2. parsnp -> core genome always same amount of snps?
     """
+
 if __name__ == '__main__':
     files = sys.argv[1:]
-    if len(files) <= 1:
+    if len(files) <= 2:
         sys.stderr.write("snp_comparator requires a minimum of 2 formatted SNP lists with their respective position and file name")
         exit(1)
-    compare_snps(files)
+    compare_snps(files[0],files[1:])
+

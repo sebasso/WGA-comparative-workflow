@@ -172,18 +172,38 @@ do
     printf "\tsuccess: ${tool_names[$counter]} $pid finished\n"
     let counter=counter+1
 done
-
+printf "Genome alignment done\n"
 date
+
+main_result_folder=$currdir/"results"
+run_specific=$main_result_folder"/$NOW-results"
+
+if [ ! -d  $main_result_folder ]; then
+      mkdir $main_result_folder
+fi
+
+mkdir $run_specific
 
 ##### COMPARATORS #######
 ##### SNP comparison
-printf "Genome alignment done\n"
-python $currdir/snp_comparator.py $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_SNPs_POS_formatted.tsv
+# 
+python $currdir/snp_comparator.py $run_specific $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_SNPs_POS_formatted.tsv
 printf "SNP comparison -> Done \n"
 date
 ### ML tree comparison
-#not implemented -> when implemented run both as subshells with a wait
+#RF distance, common leaves, number of leaves, and total nodes.
+python $currdir/tree_comparator.py $run_specific $ksnp_output/ksnp.tree $parsnp_output/parsnp.tree
 
+# Matching Split distance, Robinson-Foulds distance, path difference distance, quartet distance
+# number of taxan
+touch $run_specific/mergedtrees.tree
+cat $ksnp_output/ksnp.tree >> $run_specific/mergedtrees.tree
+printf "\n" >> $run_specific/mergedtrees.tree
+cat $parsnp_output/parsnp.tree >> $run_specific/mergedtrees.tree
+java -jar $currdir/tree_comp/bin/TreeCmp.jar -w 2 -d ms rf pd qt -i $run_specific/mergedtrees.tree\
+ -o $run_specific/tree-distances.out -I -P
+
+printf "\nTree comparison -> Done \n"
 
 
 
@@ -194,15 +214,6 @@ date
 rm $parsnp_output/parsnp.xmfa
 
 # Moving results to datefolder in results/
-main_result_folder=$currdir/"results"
-run_specific=$main_result_folder"/$NOW-results"
-
-if [ ! -d  $main_result_folder ]; then
-      mkdir $main_result_folder
-fi
-
-mkdir $run_specific
-mv snps_stats.json $run_specific
 mv $ksnp_output/ksnp.tree $run_specific
 mv $ksnp_output/kSNP_SNPs_POS_formatted.tsv $run_specific
 
