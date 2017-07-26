@@ -67,6 +67,11 @@ do
       abel="$1"
       shift
       ;;
+      -name)
+      shift
+      jobname="$1"
+      shift
+      ;;
       *)
       echo "unknown cmd: $1"
       exit_module
@@ -151,12 +156,10 @@ do
    let counter=counter+1
 done
 
-
 printf "SHELL PID: $$\n"
 printf '%s\t' "${tool_names[@]}"
 printf '%s\t' "${pids[@]}"
 printf "\n"
-#jobs -l #printing subshells status + names, OBS verbose
 
 # waiting on tool subshells
 counter=0
@@ -176,17 +179,18 @@ printf "Genome alignment done\n"
 date
 
 main_result_folder=$currdir/"results"
-run_specific=$main_result_folder"/$NOW-results"
+run_specific=$main_result_folder"/$NOW-results$jobname"
 
 if [ ! -d  $main_result_folder ]; then
       mkdir $main_result_folder
 fi
 
-mkdir $run_specific
+mkdir -p $run_specific
+printf "\nrun specific: $run_specific\n"
 
 ##### COMPARATORS #######
 ##### SNP comparison
-# 
+#
 python $currdir/snp_comparator.py $run_specific $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_SNPs_POS_formatted.tsv
 printf "SNP comparison -> Done \n"
 date
@@ -204,6 +208,7 @@ java -jar $currdir/tree_comp/bin/TreeCmp.jar -w 2 -d ms rf pd qt -i $run_specifi
  -o $run_specific/tree-distances.out -I -P
 
 printf "\nTree comparison -> Done \n"
+
 
 
 

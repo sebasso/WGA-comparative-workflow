@@ -75,7 +75,6 @@ def find_SNPs_in_same_position(files, tool_names):
         print "not implemented yet"
         exit(0)
     else:
-        print "\nstat check\n"
         for lines in files[0]:
             for lines2 in files[1]:
                 same_file = 0
@@ -117,7 +116,6 @@ def find_SNPs_in_same_position(files, tool_names):
                 elif int(l1[1]) > int(l2[1]):
                     break
 
-    print "\nstat check done ---->\n"
     return SNPs_same_position
 
 def count_snps_per_genome(snp_lists_files):
@@ -157,7 +155,7 @@ def compare_snps(outputdir, SNP_files):
     ### Printing stats
     #for entry, value in stats.items():
     #    print 'key: ',entry,'\t value: ',value
-    print "\nSnps comparator OUTPUT: \n", r, "\n"
+    #print "\nSnps comparator OUTPUT: \n", r, "\n"
     #SNPSs in total     #total number of snps per tool = len(all_files[0]), len(all_files[1]) ... len(all_files[x])
     #collections.counter can easily find how many snps occur at one position, however not so relevant in comparison
 
@@ -168,9 +166,10 @@ def compare_snps(outputdir, SNP_files):
     """
 
 if __name__ == '__main__':
+    print "Snp comparator @args:"
+    print str(sys.argv)+"\n"
     files = sys.argv[1:]
     if len(files) <= 2:
         sys.stderr.write("snp_comparator requires a minimum of 2 formatted SNP lists with their respective position and file name")
         exit(1)
     compare_snps(files[0],files[1:])
-
