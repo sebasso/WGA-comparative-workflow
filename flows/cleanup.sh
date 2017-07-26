@@ -21,7 +21,6 @@ kill_subshells(){
   done
   >&2 printf " Killing done\n"
   >&2 printf " ----------------------------------- \n"
-  exit_module
 }
 
 
@@ -31,17 +30,17 @@ cleanup(){
   >&2 printf "exit status: $?\n"
   #remove subprocesses from directories first or rm can fail if subprocesses is in an writing phase
   kill_subshells
-  if [[ $exit_status -ne 0 ]]; then
+  #if [[ $exit_status -ne 0 ]]; then
     #save stdout/stderr
-    mkdir $parsnp_path/$NOW/logs
-    mkdir $kSNP_path/$NOW/logs
+  mkdir -p $parsnp_path/logs/$NOW
+  mkdir -p $kSNP_path/logs/$NOW
 
-    mv $parsnp_output/stderr  $parsnp_path/$NOW/logs
-    mv $parsnp_output/stdout  $parsnp_path/$NOW/logs
+  mv $parsnp_output/stderr $parsnp_path/logs/$NOW
+  mv $parsnp_output/stdout $parsnp_path/logs/$NOW
 
-    mv $ksnp_output/stderr $kSNP_path/$NOW/logs
-    mv $ksnp_output/stdout $kSNP_path/$NOW/logs
-  fi
+  mv $ksnp_output/stderr $kSNP_path/logs/$NOW
+  mv $ksnp_output/stdout $kSNP_path/logs/$NOW
+  #fi
 
   if [ ! -z $run_specific ]; then
     rm -rf $run_specific
@@ -58,6 +57,7 @@ cleanup_junk(){
   if [ -d $ksnp_output ]; then
     rm -rf $ksnp_output
   fi
+
   if [ -f $kSNP_path/fasta_list ]; then
    rm $kSNP_path/fasta_list
   fi
@@ -67,4 +67,5 @@ cleanup_junk(){
   if [ -f $kSNP_path/in_list ]; then
    rm $kSNP_path/in_list
   fi
+  exit_module
 }

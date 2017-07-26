@@ -11,7 +11,8 @@ stdout.txt
 results/*
 timings/*
 !timings/gnu-time-examples.man
-
+ksnp/logs/*
+parsnp/logs/*
 
 
 #parsnp without compile files

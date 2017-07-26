@@ -225,6 +225,17 @@ mv $ksnp_output/kSNP_SNPs_POS_formatted.tsv $run_specific
 mv $parsnp_output/parsnp.tree $run_specific
 mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $run_specific
 
+ksnp_logs=$run_specific/ksnp_logs
+parsnp_logs=$run_specific/parsnp_logs
+mkdir -p $ksnp_logs
+mkdir -p $parsnp_logs
+
+mv $ksnp_output/stderr $ksnp_logs
+mv $ksnp_output/stdout $ksnp_logs
+
+mv $parsnp_output/stderr $parsnp_logs
+mv $parsnp_output/stdout $parsnp_logs
+
 date
 cleanup_junk
 exit 0

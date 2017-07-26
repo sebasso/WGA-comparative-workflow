@@ -431,7 +431,7 @@ $kSNP/rename_from_table3 all_SNPs_sorted_labelLoci fileName2genomeName SNPs_all
 
 #SNP extraction as a background process so ML tree build can start without having to wait for this. output: kSNP_SNPs_POS_formatted.tsv
 #NB: tcsh doesnt support waiting of specific PIDs OR getting them from subprocess, exit codes also lack.
-
+cat SNPs_all
 ( python $kSNP/kSNP_SNP_POS_extracter.py SNPs_all ) &
 
 
