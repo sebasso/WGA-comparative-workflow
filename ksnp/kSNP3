@@ -164,7 +164,8 @@ printf "\nos_path:\n$os_path \n"
 if ($?kchooser) then
   if ($kchooser == "1") then
     set k=`python $kSNP/Kchooser-allFiles.py in_list $kSNP $os_path`
-    if ($?k) then
+    printf "Setting kmer_size to: $k"
+    if ( "$k" == "" ) then
       set k=13
     endif
   endif
@@ -179,7 +180,8 @@ set startseconds=`date +%s`
 
 echo "input fasta_list: $fasta_list"
 echo "output directory: $dir"
-echo "k=$k"
+echo "kmer_size=$k"
+printf "kmer_size=$k"
 echo "annotate_list file: $annotate_list"
 
 if ($all_annotations == 1) then
@@ -206,7 +208,6 @@ if !($?num_cpus) then
     	/usr/sbin/system_profiler SPHardwareDataType>wubba
     	set num_cpus=` awk '/Total Number of Cores/ {print $5}' wubba`
     	echo "There are $num_cpus CPUs"
-      printf "\n os_path:\n $os_path"
     	rm wubba
 	##@ num_cpus=$num_proc
     endif
@@ -431,7 +432,7 @@ $kSNP/rename_from_table3 all_SNPs_sorted_labelLoci fileName2genomeName SNPs_all
 
 #SNP extraction as a background process so ML tree build can start without having to wait for this. output: kSNP_SNPs_POS_formatted.tsv
 #NB: tcsh doesnt support waiting of specific PIDs OR getting them from subprocess, exit codes also lack.
-cat SNPs_all
+
 ( python $kSNP/kSNP_SNP_POS_extracter.py SNPs_all ) &
 
 
