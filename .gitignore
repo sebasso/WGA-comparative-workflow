@@ -13,7 +13,7 @@ timings/*
 !timings/gnu-time-examples.man
 ksnp/logs/*
 parsnp/logs/*
-
+evolve_genome/*.pyc
 
 #parsnp without compile files
 #compile files
