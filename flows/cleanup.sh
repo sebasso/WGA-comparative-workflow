@@ -53,7 +53,7 @@ cleanup_junk(){
   if [ -d $parsnp_output ]; then
     rm -rf $parsnp_output
   fi
-  #ksnp
+
   if [ -d $ksnp_output ]; then
     rm -rf $ksnp_output
   fi

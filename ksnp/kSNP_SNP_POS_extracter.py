@@ -8,7 +8,7 @@ import os
 	line[3]=position
 	line[4]=strand
 	line[5]=filename
-	line[6]=indeitifier
+	line[6]=identifier
 						"""
 
 def parseline(line):
@@ -28,7 +28,6 @@ def parsesnps():
 	with open(sys.argv[1],"r") as f:
 		inputSnps = f.readlines()
 
-
 	outputFormattedSnps = []
 	for line in inputSnps:
 		if line in '\n':
@@ -36,11 +35,7 @@ def parsesnps():
 		else:
 			outputFormattedSnps.append(parseline(line))
 
-
 	currpath=os.getcwd()
-	#ys.stderr.write("\nsnp_extracter_path\n")
-	#sys.stderr.write(os.getcwd())
-	#sys.stderr.write("\n")
 	outputfile=currpath+"/"+"kSNP_SNPs_POS_formatted.tsv"
 	#sort on SNP position
 	outputFormattedSnps = sorted(outputFormattedSnps, key=lambda x: int(x.split("\t")[1]))
@@ -49,7 +44,6 @@ def parsesnps():
 		f.write("%s\n" %"kSNP")
 		for lineoutput in outputFormattedSnps:
 			f.write("%s\n" %lineoutput)
-
 
 
 if __name__ == '__main__':

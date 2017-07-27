@@ -216,14 +216,17 @@ printf "\nTree comparison -> Done \n"
 ###    Space saving    ### (moved here so there is less to cp below:)
 #xmfa gets really large really fast, keep binary file parsnp.ggr | saves around 80 times disk space
 # -> to get it back RUN: ./harvest_osx -i $run_specific/parsnp.ggr -X $run_specific/parsnp.xmfa #inside parsnp_folder
-rm $parsnp_output/parsnp.xmfa
 
 # Moving results to datefolder in results/
 mv $ksnp_output/ksnp.tree $run_specific
 mv $ksnp_output/kSNP_SNPs_POS_formatted.tsv $run_specific
+mv $ksnp_output/SNPs_all $run_specific
+mv $ksnp_output/SNPs_all_matrix.fasta $run_specific
 
 mv $parsnp_output/parsnp.tree $run_specific
 mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $run_specific
+mv $parsnp_output/parsnp.ggr $run_specific
+#mv $parsnp_output/parsnp.xmfa $run_specific
 
 ksnp_logs=$run_specific/ksnp_logs
 parsnp_logs=$run_specific/parsnp_logs

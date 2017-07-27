@@ -449,19 +449,6 @@ endif
 wait
 
 
-#all information available in SNPs_all is available in kSNP_SNPs_POS_formatted.tsv minus extra data of kmers
-cp $dir/ksnp.tree $kSNP
-cp $dir/kSNP_SNPs_POS_formatted.tsv $kSNP
-cp $dir/stderr $kSNP
-cp $dir/stdout $kSNP
-cd $kSNP
-rm -rf $dir/*
-mkdir $dir
-mv $kSNP/ksnp.tree $dir
-mv $kSNP/kSNP_SNPs_POS_formatted.tsv $dir
-mv $kSNP/stdout $dir
-mv $kSNP/stderr $dir
-
 #cleanup
 rm $kSNP/in_list
 rm $kSNP/annotate_genomes
