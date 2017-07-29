@@ -24,6 +24,63 @@ class Tree(object):
 		return self.leaves
 
 
+
+	"""
+	This works for evolvement without recombination
+	"""
+	def create_fasttree_file(self, filename):
+
+		# output UNIQUE snp positions in for self.leaves.snp_positions
+		leaves = self.get_leaves()
+
+		# TODO: for num_genomes in leaves instead:
+		# length of fasta snp file is equal for each genome.
+		mainsnps = {} # main snp
+		for leave in leaves:
+			#leave.snp_positions # snps
+			mainsnps.update(leave.snp_positions) # group all positions
+		mainsnps = sorted(mainsnps.items()) #list
+	#	mainsnps = OrderedDict(sorted(mainsnps.items(), key=lambda t: t[0])) # still dict
+
+		output = [""]*len(leaves)
+		print "outputlen; ",len(output),"\n\n"
+
+		#this is right since the snps are sorted ascendingly
+		common_snps = {}
+		for pos, snp in mainsnps:
+			for count, leave in enumerate(leaves): #must have enumeration here
+				if pos in leave.snp_positions:
+					if not pos in common_snps:
+						common_snps[pos] = 1
+					else:
+						common_snps[pos] += 1
+					common_snps[pos]
+					output[count] += leave.snp_positions[pos] # add this to string
+				else:
+					output[count] += "-" # add this to string
+					#append "-" for leave
+
+		print "\n\n\n"
+		print "common snps among genomes:"
+		print sum(common_snps.values())
+		print "\n\n\n"
+
+		"""	DOES this create same output?
+			What about putting snps
+
+			!!! is everything going out!?
+		"""
+		tempout = ""
+		for nr,out in enumerate(output):
+			tempout += ">"+filename+str(nr)+"\n"+out+"\n"
+		#print tempout
+		with open("fasttreeoutput.fasta","w") as f:
+			f.write(tempout)
+		print "\n"
+		exit(0)
+
+
+
 class Node(object):
 	"""docstring for Node"""
 	def __init__(self, *args):
@@ -78,7 +135,6 @@ class Node(object):
 		num_snps = random.choice(snp_interval) #uniform distribution, if not use np.random.choide(seq, list_of_probaility distribution)
 		#snp_interval = [1,2,3]
 		#num_snps = np.random.choice(snp_interval, p=[0.7, 0.21, 0.09])
-
 		for i in range(0,num_snps):
 
 			position = random.randrange(0, len(genome)) # pick position -> assumption: all positions in genome are equally prone to a snp (should be changed to differentiate core genome)
@@ -132,15 +188,13 @@ class Node(object):
 	def create_fasttree_snps(self, refgenome):
 		fasta_format = ""
 		gap="-"
-
-		self.snp_positions
 		sorted(self.snp_positions.iterkeys())
 
 		for key in sorted(self.snp_positions.iterkeys()):
 			key, self.snp_positions[key] # sorted
 
-
 		return fasta_format
+
 
 	def get_snp_stats(self):
 		return self.snp_positions

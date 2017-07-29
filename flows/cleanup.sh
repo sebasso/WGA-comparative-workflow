@@ -32,15 +32,23 @@ cleanup(){
   kill_subshells
   #if [[ $exit_status -ne 0 ]]; then
     #save stdout/stderr
+
+  crashed = logs/$NOW$name
   mkdir -p $parsnp_path/logs/$NOW
   mkdir -p $kSNP_path/logs/$NOW
-
-  mv $parsnp_output/stderr $parsnp_path/logs/$NOW
-  mv $parsnp_output/stdout $parsnp_path/logs/$NOW
-
-  mv $ksnp_output/stderr $kSNP_path/logs/$NOW
-  mv $ksnp_output/stdout $kSNP_path/logs/$NOW
-  #fi
+  # save logs
+  mv $parsnp_output/stderr $parsnp_path/$crashed
+  mv $parsnp_output/stdout $parsnp_path/$crashed
+  mv $ksnp_output/stderr $kSNP_path/$crashed
+  mv $ksnp_output/stdout $kSNP_path/$crashed
+  #Save files
+  mv $ksnp_output/ksnp.tree $kSNP_path/$crashed
+  mv $ksnp_output/kSNP_SNPs_POS_formatted.tsv $kSNP_path/$crashed
+  mv $ksnp_output/SNPs_all $kSNP_path/$crashed
+  mv $ksnp_output/SNPs_all_matrix.fasta $kSNP_path/$crashed
+  mv $parsnp_output/parsnp.tree $parsnp_path/$crashed
+  mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $parsnp_path/$crashed
+  mv $parsnp_output/parsnp.ggr $parsnp_path/$crashed
 
   if [ ! -z $run_specific ]; then
     rm -rf $run_specific

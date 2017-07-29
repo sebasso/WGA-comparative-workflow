@@ -101,7 +101,8 @@ def evolve_genome(args):
 	leaves_list = tree.get_leaves()
 	print "done making structure"
 	print "num leaves: ", len(leaves_list)
-
+	tree.create_fasttree_file(filename)
+	exit(0)
 #	write_genomes_and_snp_stats(leaves_list, num_genomes)
 
 	identities = []
@@ -126,8 +127,6 @@ def evolve_genome(args):
 
 	outputfilename = outputdirgenomes+os.sep+filename
 
-	print num_genomes
-	print len(leaves_list),"\n"
 	fasttree = ""
 	for i in xrange(0, num_genomes):
 		leave_genome = leaves_list[i].get_mutated_genome(genome)
