@@ -6,6 +6,7 @@ import sys
 import os
 from collections import Counter
 import json
+import re
 
 """
     further development:
@@ -49,83 +50,65 @@ import json
 """
 
 
-def readfiles(files):
+def readfiles(files):#files[0]=ksnp, files[1]=parsnp
     all_files = []
     tool_names = []
+    snp_group_count = []
 
     for f in files:
         with open(f,"r") as f:
             tmp = f.readlines()
-            filename = tmp[0]
-            all_files.append(tmp[1:])
-            tool_names.append(filename.rstrip())
+            tool_names.append(tmp[0].rstrip())
+            snp_group_count.append(tmp[1].rstrip())
+            all_files.append(tmp[2:])
 
     sys.stdout.write("Comparing tools: "+str(tool_names)+"\n")
-
+    print "snp group count(snp_comparator): ",snp_group_count,"\n"
     return all_files, tool_names
 
 
 def find_SNPs_in_same_position(files, tool_names):
-    comparisons = len(files)-1
-
     SNPs_same_position = {}
 
-    if len(files)>2:
-        #multiple loop
-        print "not implemented yet"
-        exit(0)
-    else:
-        for lines in files[0]:
-            for lines2 in files[1]:
-                same_file = 0
-                l1 = lines.split("\t")
-                l2 = lines2.split("\t")
+    for i, snp_file in enumerate(files):
+        for j in xrange(0,len(snp_file)):
+            l1 = snp_file[j].rstrip().split("\t")
+            if l1[1] != "x": #unknown position snp from ksnp, still relevant when constructing tree from alignment there it is here
                 key = int(l1[1])
-                if  key == int(l2[1]):
-
-                    if key in SNPs_same_position: # key= position in genome
-                        if l1[0] == l2[0]:
-                            SNPs_same_position[key][tool_names[0]][l1[0]] = []
-                            SNPs_same_position[key][tool_names[0]][l1[0]].append(l1[2])
-                            SNPs_same_position[key][tool_names[0]][l1[0]].append("common\t"+tool_names[1])
-                            SNPs_same_position[key][tool_names[1]][l2[0]] = []
-                            SNPs_same_position[key][tool_names[1]][l2[0]].append(l2[2])
-                            SNPs_same_position[key][tool_names[1]][l2[0]].append("common\t"+tool_names[0])
+                if key in SNPs_same_position:
+                    if tool_names[i] in SNPs_same_position[key]:
+                        if l1[0] in SNPs_same_position[key][tool_names[i]]:
+                            SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
                         else:
-                            SNPs_same_position[key][tool_names[0]][l1[0]] = l1[2]
-                            SNPs_same_position[key][tool_names[1]][l2[0]] = l2[2]
-
+                            SNPs_same_position[key][tool_names[i]][l1[0]] = {}
+                            SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
                     else:
-                        SNPs_same_position[key] = {}
-                        SNPs_same_position[key][tool_names[0]] = {}
-                        SNPs_same_position[key][tool_names[1]] = {}
-                        if l1[0] == l2[0]:#TODO, handle this in js?
-                            SNPs_same_position[key][tool_names[0]][l1[0]] = []
-                            SNPs_same_position[key][tool_names[0]][l1[0]].append(l1[2])
-                            SNPs_same_position[key][tool_names[0]][l1[0]].append("common\t"+tool_names[1])
-                            SNPs_same_position[key][tool_names[1]][l2[0]] = []
-                            SNPs_same_position[key][tool_names[1]][l2[0]].append(l2[2])
-                            SNPs_same_position[key][tool_names[1]][l2[0]].append("common\t"+tool_names[0])
-
-                        else:
-                            SNPs_same_position[key][tool_names[0]][l1[0]] = l1[2]
-                            SNPs_same_position[key][tool_names[1]][l2[0]] = l2[2]
-
-                    # same filename && position
-
-                elif int(l1[1]) > int(l2[1]):
-                    break
+                        SNPs_same_position[key][tool_names[i]] = {}
+                        SNPs_same_position[key][tool_names[i]][l1[0]] = {}
+                        SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
+                else:
+                    SNPs_same_position[key] = {}
+                    SNPs_same_position[key][tool_names[i]] = {}
+                    SNPs_same_position[key][tool_names[i]][l1[0]] = {}
+                    SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
+            else:
+                SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
 
     return SNPs_same_position
 
+
+
 def count_snps_per_genome(snp_lists_files):
     SNPs_per_genome = []
+    grouped_snp_pos = []
     for f in snp_lists_files:
-        genome_SNP_count = Counter(map(lambda x: x.split("\t")[0], f)) # dict response, should consider this on the count of position as well
+        genome_SNP_count = Counter(map(lambda x: x.split("\t")[0], f))
+        snp_group_count = Counter(map(lambda x: x.split("\t")[1], f)).keys()
         #genome_loci_occurence = Counter(map(lambda x: x.split("\t")[1], f))
         SNPs_per_genome.append(genome_SNP_count)
+        grouped_snp_pos.append(len(snp_group_count))
 
-    return SNPs_per_genome
+    return SNPs_per_genome, grouped_snp_pos
 
 
 def compare_snps(outputdir, SNP_files):
@@ -136,14 +119,29 @@ def compare_snps(outputdir, SNP_files):
     stats = {}
     stats["tool_names"] = tool_names
     stats["total_snps"] = []
+    #SNP_files[0] = ".../ksnp/ksnp_output/kSNP_SNPs_POS_formatted.tsv"
+    #TODO: change this for universal use, same in parsnp
+    ksnp_output = SNP_files[0][:-27] #kSNP_SNPs_POS_formatted.tsv
+    # grep for num_snp_groups:
 
+    ksnp_output += "stdout"
+    print "ksnp path: ",ksnp_output,"\n"
+    with open(ksnp_output,"r") as f:
+        match = re.search('num_snp_groups: (.*)', f.read())
+
+    if match:
+        print match.group(0)
+        ksnp_snp_groups = int(match.group(0).split(" ")[1])
+        
     ### SETTING stats:
     #total number of snps per tool = len(all_files[0]), len(all_files[1]) ... len(all_files[x])
     for i in xrange(0,len(snp_lists_files)):
-        stats["total_snps"].append(len(snp_lists_files[i]))
+        stats["total_snps"].append(len(snp_lists_files[i])) #total_snps is the sum of snps even in the same position
+        #TODO: incorporate SNP_group which will give unique snps after position
 
-    stats["SNPs_per_genome"] = count_snps_per_genome(snp_lists_files)
-
+    stats["SNPs_per_genome"], grouped_snp_pos = count_snps_per_genome(snp_lists_files)
+    print "\n"
+    print "grouped_snp_pos: ",grouped_snp_pos,"\n"
     SNPs_loci = find_SNPs_in_same_position(snp_lists_files, tool_names)
     stats["same_loci_snps"] = SNPs_loci
 
@@ -160,9 +158,8 @@ def compare_snps(outputdir, SNP_files):
     #collections.counter can easily find how many snps occur at one position, however not so relevant in comparison
 
     """
-    NB:
-    1. parsnp doesnt compare all fasta files, will be different output there
-    2. parsnp -> core genome always same amount of snps?
+    TODO: count how many snp groups in ksnp?
+        new metric: SNPs_per_genome / num_snp_groups
     """
 
 if __name__ == '__main__':

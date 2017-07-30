@@ -33,7 +33,7 @@ cleanup(){
   #if [[ $exit_status -ne 0 ]]; then
     #save stdout/stderr
 
-  crashed = logs/$NOW$name
+  crashed=logs/$NOW$name
   mkdir -p $parsnp_path/logs/$NOW
   mkdir -p $kSNP_path/logs/$NOW
   # save logs
@@ -61,6 +61,9 @@ cleanup_junk(){
   if [ -d $parsnp_output ]; then
     rm -rf $parsnp_output
   fi
+  if [ -f $parsnp_path/allmums.out ]; then
+    rm $parsnp_path/allmums.out
+  fi
 
   if [ -d $ksnp_output ]; then
     rm -rf $ksnp_output
@@ -75,5 +78,13 @@ cleanup_junk(){
   if [ -f $kSNP_path/in_list ]; then
    rm $kSNP_path/in_list
   fi
+
+ # if [ -d $simulated_dir ]; then
+   # rm -rf $simulated_dir
+  #fi
+
   exit_module
 }
+
+
+

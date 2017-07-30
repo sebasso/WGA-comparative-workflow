@@ -391,7 +391,7 @@ if (-s annotate_list) then
 	set f=`grep -w  $genome fileName2genomeName | awk '{print $1}'`
 	if ($test > 0 ) then
 	    set file=`grep -w  $genome fasta_list  | awk -F'\011' '{print $1}'`
-	    printf "genome: $genome  in Dir.$f\n"
+	    #printf "genome: $genome  in Dir.$f\n"
 	    awk -F'\011' '{print ">" $1 "_" $2 "\n" $3 }' Dir.$f/SNPs >! Dir.$f/SNPs.fasta
 	    printf "$kSNP/$os_path/mummer -maxmatch -l $k -b -c  Dir.$f/SNPs.fasta "'"'"$file"'"'" > Dir.$f/mummer.out\n" >> cmds_mummer
 	    printf "$kSNP/parse_mummer4kSNP3  Dir.$f/mummer.out  > Dir.$f/SNP.positions\n" >> cmds_parse_mummer

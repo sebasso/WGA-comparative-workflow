@@ -982,22 +982,6 @@ if __name__ == "__main__":
         os.system("mv "+outputDir+os.sep+"parsnpAligner.xmfa "+outputDir+os.sep+"parsnp.xmfa")
     xmfafile = open(outputDir+os.sep+"parsnp.xmfa",'r')
 
-    pyfile = executables+"/parsnp_SNP_POS_extracter.py"
-    inputfile = outputDir+"/parsnp.xmfa"
-    #sys.executable = python interpreter path
-    p = subprocess.Popen([sys.executable,pyfile,inputfile, outputDir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    """fstdout,fstderr = p.communicate() communicate is implicitly setting returncode after call but nicer with wait?
-    sys.stderr.write("\n")
-    sys.stderr.write(fstdout)
-    sys.stderr.write("\n")
-    sys.stderr.write(fstderr)
-    sys.stderr.write("\n")"""
-    #p.returncode
-    returncode = p.wait()
-    if returncode > 0:
-        sys.stderr.write("parsnp_SNP_POS_extracter failed with exit code: "+str(returncode))
-        exit(1)
-
     file2hdr_dict = {}
     fileid = ""
     blockfiles = []
@@ -1183,6 +1167,22 @@ if __name__ == "__main__":
             run_command("%s/harvest -q -b %s,REP,\"Intragenomic repeats > 100bp\" -o %s/parsnp.ggr -i %s/parsnp.ggr"%(PARSNP_DIR,repfile,outputDir,outputDir))
 
         run_command("%s/harvest -q -i %s/parsnp.ggr -S "%(PARSNP_DIR,outputDir)+outputDir+os.sep+"parsnp.snps.mblocks")
+
+    command = "%s/harvest -q -i %s/parsnp.ggr -V "%(PARSNP_DIR,outputDir)+outputDir+os.sep+"parsnp.snps.vcf" # -i parsnp.ggr -V test2.vcf
+    run_command(command)
+    pyfile = executables+"/format_vcf.py"
+    inputfile = outputDir+os.sep+"parsnp.snps.vcf"
+
+    p = subprocess.Popen([sys.executable,pyfile,inputfile, outputDir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    sys.stderr.write("format_vcf stderr:\n"+stderr)
+    sys.stdout.write("format_vcf stdout:\n"+stdout)
+    #returncode = p.wait()
+    returncode = p.returncode
+    if returncode > 0:
+        print "returncode: ",returncode
+        sys.stderr.write("format_vcf failed with exit code: "+str(returncode))
+        exit(1)
 
     #fasttreeOPTIONS HERE:(same as in ksnp)
     command = "%s/ft -nt -gtr -slow "%(PARSNP_DIR)+outputDir+os.sep+"parsnp.snps.mblocks > "+outputDir+os.sep+"parsnp.tree"

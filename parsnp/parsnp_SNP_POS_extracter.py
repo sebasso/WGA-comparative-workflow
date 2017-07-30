@@ -36,18 +36,8 @@ def parsesnps():
 			snpid = header[0].split(":")[0][1:]
 			startpos = header[0].split(":")[1]
 
-			"""sys.stderr.write("\nsnpID:\n")
-			sys.stderr.write(snpid)
-			sys.stderr.write("\n")
-			sys.stderr.write("\startpos:\n")
-			sys.stderr.write(startpos)
-			sys.stderr.write("\n")"""
-
 			if not snpid in snps:
 				snps[snpid] = []
-
-		elif inputSnps[j].startswith("="):#done with xmfa file
-			break
 		else:
 			for char in inputSnps[j]:#linewise
 				poscount += 1

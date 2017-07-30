@@ -28,7 +28,7 @@ class Tree(object):
 	"""
 	This works for evolvement without recombination
 	"""
-	def create_fasttree_file(self, filename):
+	def create_fasttree_file(self, filename, outputdir):
 
 		# output UNIQUE snp positions in for self.leaves.snp_positions
 		leaves = self.get_leaves()
@@ -45,9 +45,9 @@ class Tree(object):
 		output = [""]*len(leaves)
 		print "outputlen; ",len(output),"\n\n"
 
-		#this is right since the snps are sorted ascendingly
+		#works since the snps are sorted ascendingly
 		common_snps = {}
-		for pos, snp in mainsnps:
+		for pos, snp in mainsnps: # for snp position there is check which leaves it is in, if its not in the leave append base from reference_genome
 			for count, leave in enumerate(leaves): #must have enumeration here
 				if pos in leave.snp_positions:
 					if not pos in common_snps:
@@ -57,27 +57,18 @@ class Tree(object):
 					common_snps[pos]
 					output[count] += leave.snp_positions[pos] # add this to string
 				else:
-					output[count] += "-" # add this to string
-					#append "-" for leave
+					output[count] += self.genome[pos] #add reference-snp as this will be the same in the genome
 
-		print "\n\n\n"
+		
 		print "common snps among genomes:"
 		print sum(common_snps.values())
-		print "\n\n\n"
-
-		"""	DOES this create same output?
-			What about putting snps
-
-			!!! is everything going out!?
-		"""
+		
 		tempout = ""
 		for nr,out in enumerate(output):
 			tempout += ">"+filename+str(nr)+"\n"+out+"\n"
-		#print tempout
-		with open("fasttreeoutput.fasta","w") as f:
+		
+		with open(outputdir+"/fasttreeoutput.fasta","w") as f:
 			f.write(tempout)
-		print "\n"
-		exit(0)
 
 
 

@@ -58,7 +58,7 @@ def robinson_fould(outputdir, input_trees):
             f.write(ete_trees[0].write())#ksnp
 
         with open(outputdir+"/parsnp_pruned.tree","w") as f:
-            ete_trees[1].write()#parsnp
+            f.write(ete_trees[1].write())#parsnp
 
 
 

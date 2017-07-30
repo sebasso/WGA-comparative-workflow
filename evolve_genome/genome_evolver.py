@@ -22,28 +22,15 @@ import argparse
 import Tree as t
 
 """
-x2. even distribution of snps along evolution tree, aka evolve more times if it says so in order to achieve som difference
-
-x3. only enable np.random.choice if different nucleotides probabilities are enabled
-	random.choice is much faster.
-
-
-1. should all fasta be put in same file?
-	pros, easy, cons, requires parsing to the tools
-	anaswer -> create directory with all the genome files + the reference
-2. create masterfile with all the snp history
 3. output snps per leave as done in ksnp and parsnp, check how they use position
 	- use gaps or not?
 
-4. consider extra function that tests tools on weakness and strengths
- 	creates snps at kmer interval
-	outside core genome? impossible to know
-
-5. ksnp testing with snp_density?
-6. how to test parsnp?
+future:
+	nb: all of this requires running ksnp_chooser for ksnp and modifying and printing out the core-genome from parsnp.1
+	1. ksnp testing with snp_density, have extra constraint on snp density > (kmersize/2)-1
+	2. parsnp -> find core-genome and mutate only that section of the genome.
 """
 
-# python genome_evolver.py /Users/sebastiansoberg/Downloads/Example1/EEE_NJ-60.fasta 2 200 0.25,0.25,0.10,0.40
 def evolve_genome(args):
 	refgenome = args.refgenome
 	filename = os.path.basename(args.refgenome)
@@ -101,9 +88,7 @@ def evolve_genome(args):
 	leaves_list = tree.get_leaves()
 	print "done making structure"
 	print "num leaves: ", len(leaves_list)
-	tree.create_fasttree_file(filename)
-	exit(0)
-#	write_genomes_and_snp_stats(leaves_list, num_genomes)
+	tree.create_fasttree_file(filename, outputdir)
 
 	identities = []
 	max_snp_diff = 0
@@ -126,7 +111,7 @@ def evolve_genome(args):
 		os.makedirs(statsfolders)
 
 	outputfilename = outputdirgenomes+os.sep+filename
-
+	print outputfilename
 	fasttree = ""
 	for i in xrange(0, num_genomes):
 		leave_genome = leaves_list[i].get_mutated_genome(genome)
@@ -141,7 +126,7 @@ def evolve_genome(args):
 
 		#TODO: Write fasttree output here or just call fasttree from here......
 		fasttree += meta
-		stats
+		#stats
 
 
 	#NB: can be removed, however move stat calcs to above, or just keep this as stat section

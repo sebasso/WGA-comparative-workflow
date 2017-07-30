@@ -72,6 +72,26 @@ do
       jobname="$1"
       shift
       ;;
+      -simulate)
+      shift
+      simulate="$1"
+      shift
+      ;;
+      -percent)
+      shift
+      percent="$1"
+      shift
+      ;;
+      -num_genomes)
+      shift
+      num_genomes="$1"
+      shift
+      ;;
+      -probabilities)
+      shift
+      probabilities="$1"
+      shift
+      ;;
       *)
       echo "unknown cmd: $1"
       exit_module
@@ -80,7 +100,6 @@ do
   esac
 done
 
-#checking required options and type
 if [ -z "$ref" ] && [ ! -f "$ref" ];
 then
   printf "Reference genome must be supplied\n -ref path_to_referencegenome.fasta"
@@ -118,6 +137,32 @@ then
 else
   printf "\n OS not supported: $OS"
   exit_module
+fi
+
+
+#python genome_evolver.py --refgenome /Users/sebastiansoberg/Downloads/Example1/EEE_NJ-60.fasta --percent 2 --num_genomes 200 --nucleotide_probabilities 0.25,0.25,0.4,0.1
+
+if [ ! -z "$simulate" ];
+then
+  if [ -z "$percent" ];
+  then
+    percent=2
+  fi
+  if [ -z "$num_genomes" ];
+  then
+    num_genomes=30
+  fi
+  simulated_dir=$currdir/evolve_genome/simulated_genomes$NOW$jobname
+  mkdir -p simulated_dir
+  genome_path=$simulated_dir/genomes
+  snp_stats=$simulated_dir/snp_stats
+
+  if [ -z "$probabilities" ]; #TODO: RUN fasttree on $simulated_dir/fasttreeoutput.fasta and output it to $simulated_dir
+  then
+    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir
+  else
+    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --nucleotide_probabilities $probabilities
+  fi
 fi
 
 #### preprocessing of inputfiles(ksnp ONLY((Galaxy inputformat legacy))
@@ -178,6 +223,8 @@ done
 printf "Genome alignment done\n"
 date
 
+
+
 main_result_folder=$currdir/"results"
 run_specific=$main_result_folder"/$NOW-results$jobname"
 
@@ -188,10 +235,16 @@ fi
 mkdir -p $run_specific
 printf "\nrun specific: $run_specific\n"
 
+
+if [ ! -z "$simulate" ];
+then
+  python $currdir/tree_comparator.py $run_specific $parsnp_output/parsnp.tree $simulated_dir/outputree
+  python $currdir/tree_comparator.py $run_specific $ksnp_output/ksnp.tree $simulated_dir/outputree
+  
+fi
 ##### COMPARATORS #######
 ##### SNP comparison
-#
-python $currdir/snp_comparator.py $run_specific $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_SNPs_POS_formatted.tsv
+python $currdir/snp_comparator.py $run_specific $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_snps_sorted.tsv
 printf "SNP comparison -> Done \n"
 date
 ### ML tree comparison
@@ -204,12 +257,10 @@ touch $run_specific/mergedtrees.tree
 cat $ksnp_output/ksnp.tree >> $run_specific/mergedtrees.tree
 printf "\n" >> $run_specific/mergedtrees.tree
 cat $parsnp_output/parsnp.tree >> $run_specific/mergedtrees.tree
-java -jar $currdir/tree_comp/bin/TreeCmp.jar -w 2 -d ms rf pd qt -i $run_specific/mergedtrees.tree\
+java -jar $currdir/tree_comp/bin/TreeCmp.jar -m -d ms rf pd qt -i $run_specific/mergedtrees.tree\
  -o $run_specific/tree-distances.out -I -P
 
 printf "\nTree comparison -> Done \n"
-
-
 
 
 
@@ -224,9 +275,11 @@ mv $ksnp_output/SNPs_all $run_specific
 mv $ksnp_output/SNPs_all_matrix.fasta $run_specific
 
 mv $parsnp_output/parsnp.tree $run_specific
-mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $run_specific
+#mv $parsnp_output/parsnp_SNPs_POS_formatted.tsv $run_specific
 mv $parsnp_output/parsnp.ggr $run_specific
-#mv $parsnp_output/parsnp.xmfa $run_specific
+mv $parsnp_output/parsnp.xmfa $run_specific
+mv $parsnp_output/parsnp.snps.vcf $run_specific
+mv $parsnp_output/parsnp_snps_sorted.tsv $run_specific
 
 ksnp_logs=$run_specific/ksnp_logs
 parsnp_logs=$run_specific/parsnp_logs
