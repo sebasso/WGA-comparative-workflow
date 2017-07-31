@@ -140,8 +140,6 @@ else
 fi
 
 
-#python genome_evolver.py --refgenome /Users/sebastiansoberg/Downloads/Example1/EEE_NJ-60.fasta --percent 2 --num_genomes 200 --nucleotide_probabilities 0.25,0.25,0.4,0.1
-
 if [ ! -z "$simulate" ];
 then
   if [ -z "$percent" ];
@@ -152,10 +150,14 @@ then
   then
     num_genomes=30
   fi
-  simulated_dir=$currdir/evolve_genome/simulated_genomes$NOW$jobname
-  mkdir -p simulated_dir
+  printf "\ncurrdir: "$currdir"\n"
+  simulated_dir=$currdir/evolve_genome/simulated_genomes/$NOW$jobname
+  printf "simulated_dir: "$simulated_dir"\n"
+  mkdir -p $simulated_dir
   genome_path=$simulated_dir/genomes
+  mkdir $genome_path
   snp_stats=$simulated_dir/snp_stats
+  mkdir $snp_stats
 
   if [ -z "$probabilities" ]; #TODO: RUN fasttree on $simulated_dir/fasttreeoutput.fasta and output it to $simulated_dir
   then
@@ -238,10 +240,46 @@ printf "\nrun specific: $run_specific\n"
 
 if [ ! -z "$simulate" ];
 then
-  python $currdir/tree_comparator.py $run_specific $parsnp_output/parsnp.tree $simulated_dir/outputree
-  python $currdir/tree_comparator.py $run_specific $ksnp_output/ksnp.tree $simulated_dir/outputree
-  
+  printf "Simulation started:\n"
+  simulation_res=$run_specific/simulation # TODO: fix output
+  #TODO: fix snp format from simulator
+  printf "snp_statsdirectory:",$snp_stats
+  ls $snp_stats
+  printf "\n"
+  mkdir -p $simulation_res/ksnp
+  mkdir -p $simulation_res/parsnp
+  python $currdir/snp_comparator.py $simulation_res/ksnp $ksnp_output/kSNP_SNPs_POS_formatted.tsv $snp_stats/reference_formatted_snps.tsv
+  python $currdir/snp_comparator.py $simulation_res/parsnp $parsnp_output/parsnp_snps_sorted.tsv $snp_stats/reference_formatted_snps.tsv
+
+  cd $currdir/common-sw
+  if [ "$OS" == "Darwin" ];
+  then
+    printf "currdir: "$currdir
+    ./FastTreeMP_osx -slow -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
+  elif [ "$OS" == "Linux" ]; then
+    ./FastTreeMP_linux -slow -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
+  fi
+  cd $currdir
+  python $currdir/tree_comparator.py $simulation_res/parsnp $parsnp_output/parsnp.tree $simulated_dir/reference-tree.tree
+  python $currdir/tree_comparator.py $simulation_res/ksnp $ksnp_output/ksnp.tree $simulated_dir/reference-tree.tree
+
+  touch $simulation_res/mergedtrees.tree
+  cat $ksnp_output/ksnp.tree >> $simulation_res/mergedtrees.tree
+  printf "\n" >> $simulation_res/mergedtrees.tree
+  cat $simulated_dir/reference-tree.tree >> $simulation_res/mergedtrees.tree
+  java -jar $currdir/tree_comp/bin/TreeCmp.jar -m -d ms rf pd qt -i $simulation_res/mergedtrees.tree\
+   -o $simulation_res/ksnp/distances-refvsparsnp.txt -I -P
+
+  cat $parsnp_output/parsnp.tree > $simulation_res/mergedtrees.tree
+  printf "\n" >> $simulation_res/mergedtrees.tree
+  cat $simulated_dir/reference-tree.tree >> $simulation_res/mergedtrees.tree
+  java -jar $currdir/tree_comp/bin/TreeCmp.jar -m -d ms rf pd qt -i $simulation_res/mergedtrees.tree\
+   -o $simulation_res/parsnp/distances-refvsksnp.txt -I -P
+
+
+  printf "after simulation res\n"
 fi
+
 ##### COMPARATORS #######
 ##### SNP comparison
 python $currdir/snp_comparator.py $run_specific $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_snps_sorted.tsv
@@ -258,7 +296,7 @@ cat $ksnp_output/ksnp.tree >> $run_specific/mergedtrees.tree
 printf "\n" >> $run_specific/mergedtrees.tree
 cat $parsnp_output/parsnp.tree >> $run_specific/mergedtrees.tree
 java -jar $currdir/tree_comp/bin/TreeCmp.jar -m -d ms rf pd qt -i $run_specific/mergedtrees.tree\
- -o $run_specific/tree-distances.out -I -P
+ -o $run_specific/tree-distances.txt -I -P
 
 printf "\nTree comparison -> Done \n"
 

@@ -15,7 +15,9 @@ so only similar leafs are part of the stats.
 def robinson_fould(outputdir, input_trees):
 
     ete_trees = []
+    treenames = []
     for tree in input_trees:
+        treenames.append(os.path.basename(tree).split(".")[0]+"pruned.tree")
         ete_trees.append(Tree(tree))
 
     rf, max_rf, common_leaves, parts_t1, parts_t2,u1,u2 = ete_trees[0].robinson_foulds(ete_trees[1],unrooted_trees=True)
@@ -36,7 +38,7 @@ def robinson_fould(outputdir, input_trees):
 
     #TODO: check cached_content vs len(treenode)
     #num_genomes = common_leaves always when comparing
-    r = json.dumps(stats, indent=4, encoding="utf-8", sort_keys=True)
+    r = json.dumps(stats, indent=4, encoding=" utf-8", sort_keys=True)
 
 
     with open(outputdir+"/tree_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
@@ -54,11 +56,10 @@ def robinson_fould(outputdir, input_trees):
                 leave.delete()
 
         print "num leaves after pruning:", len(ete_trees[0]), len(ete_trees[1])
-        with open(outputdir+"/ksnp_pruned.tree","w") as f:
-            f.write(ete_trees[0].write())#ksnp
-
-        with open(outputdir+"/parsnp_pruned.tree","w") as f:
-            f.write(ete_trees[1].write())#parsnp
+        for trees in ete_trees:
+            for i in xrange(0,len(ete_trees)):
+                with open(outputdir+"/"+treenames[i],"w") as f:
+                    f.write(ete_trees[i].write())
 
 
 

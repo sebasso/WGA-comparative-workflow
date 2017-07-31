@@ -16,6 +16,7 @@ parsnp/logs/*
 evolve_genome/*.pyc
 evolve_genome/output/
 evolve_genome/genomes/
+evolve_genome/simulated_genomes/
 
 #parsnp without compile files
 #compile files

@@ -36,10 +36,17 @@ def parse_vcf():
         #EEE_FL93-939.fasta	286	C	gb|EF151502.1|gi|119633046|Eastern	F
         for i, snp_present in enumerate(l[9:line_len]):
             filename = temp[9+i]
-            if snp_present == "1":
-                output += filename+sep+pos+sep+altbase+"\n"
-            else:
-                output += filename+sep+pos+sep+ref+"\n" #this make sense since in ksnp they use kmers against each other, here reference genome is used
+            alt_num = int(snp_present)
+            if alt_num > 0:
+                alt_bases = altbase.split(",")
+                output += filename+sep+pos+sep+alt_bases[alt_num-1]+"\n" # DON't add those who have similar as reference genome as that isnt a snp
+                #if len(num_alts) > 1:
+                 #   output += filename+sep+pos+sep+altbase+"\n" # DON't add those who have similar as reference genome as that isnt a snp
+                #if len(num_alts) == 1:
+                 #   output += filename+sep+pos+sep+altbase+"\n" # DON't add those who have similar as reference genome as that isnt a snp
+
+            
+            
         #1	286	AGTACCACTG.TATTTGCCCA	T	C	40	PASS	NA	GT	0	1	0
 
     with open(sys.argv[2]+"/parsnp_snps_sorted.tsv","w") as f:

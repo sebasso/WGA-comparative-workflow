@@ -86,9 +86,10 @@ def evolve_genome(args):
 	assert maxdiff_generation >= 1
 	tree = t.Tree(startdiff, maxdiff, generations, wait_generations, genome, maxdiff_generation, base_probabilities)
 	leaves_list = tree.get_leaves()
+
 	print "done making structure"
 	print "num leaves: ", len(leaves_list)
-	tree.create_fasttree_file(filename, outputdir)
+	mainsnps_grouped = tree.create_fasttree_file(filename, outputdir, num_genomes)
 
 	identities = []
 	max_snp_diff = 0
@@ -111,8 +112,10 @@ def evolve_genome(args):
 		os.makedirs(statsfolders)
 
 	outputfilename = outputdirgenomes+os.sep+filename
-	print outputfilename
-	fasttree = ""
+
+	snp_formatted_file = "reference\n"
+	snp_formatted_file += str(len(mainsnps_grouped))+"\n"
+	sep = "\t"
 	for i in xrange(0, num_genomes):
 		leave_genome = leaves_list[i].get_mutated_genome(genome)
 
@@ -121,13 +124,19 @@ def evolve_genome(args):
 			f.write(leave_genome)
 
 		stats = leaves_list[i].get_snp_stats()
+
 		with open(statsfolders+os.sep+filename+str(i),"w") as f:
-			f.write(str(stats)) #NB: not portable
+			f.write(str(stats))
 
-		#TODO: Write fasttree output here or just call fasttree from here......
-		fasttree += meta
-		#stats
 
+		for position, snp in stats.iteritems():#TODO: increase position by 1
+			snp_formatted_file += filename+str(i)+sep+str(position+1)+sep+snp+"\n" # position+1 because it starts at 0, since its more effective to have here with get_mutated_genome normalizing posistion before this loop will cause that method to fail
+
+	for pos, snp in mainsnps_grouped.iteritems():
+		snp_formatted_file += "reference"+sep+str(pos+1)+sep+genome[pos]+"\n" 
+	
+	with open(statsfolders+os.sep+"reference_formatted_snps.tsv","w") as f:
+		f.write(snp_formatted_file)
 
 	#NB: can be removed, however move stat calcs to above, or just keep this as stat section
 	for leave in leaves_list:
@@ -145,7 +154,7 @@ def evolve_genome(args):
 			max_snp_diff = leave.snp_diff
 
 
-	print "\nStats:"
+	print "Stats:"
 	print "Lowest identitiy: ",low, " Highest identitiy: ",high
 	print "Max snps per leave: ", max_snp_diff, " of: ", maxdiff
 	print "Unique probability distributions based on % identitity(bases) between reference and leaves: ",len(set(identities)), " of distributions: ", len(identities)

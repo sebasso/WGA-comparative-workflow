@@ -111,6 +111,7 @@ def count_snps_per_genome(snp_lists_files):
     return SNPs_per_genome, grouped_snp_pos
 
 
+
 def compare_snps(outputdir, SNP_files):
     files = SNP_files
 
@@ -119,20 +120,7 @@ def compare_snps(outputdir, SNP_files):
     stats = {}
     stats["tool_names"] = tool_names
     stats["total_snps"] = []
-    #SNP_files[0] = ".../ksnp/ksnp_output/kSNP_SNPs_POS_formatted.tsv"
-    #TODO: change this for universal use, same in parsnp
-    ksnp_output = SNP_files[0][:-27] #kSNP_SNPs_POS_formatted.tsv
-    # grep for num_snp_groups:
 
-    ksnp_output += "stdout"
-    print "ksnp path: ",ksnp_output,"\n"
-    with open(ksnp_output,"r") as f:
-        match = re.search('num_snp_groups: (.*)', f.read())
-
-    if match:
-        print match.group(0)
-        ksnp_snp_groups = int(match.group(0).split(" ")[1])
-        
     ### SETTING stats:
     #total number of snps per tool = len(all_files[0]), len(all_files[1]) ... len(all_files[x])
     for i in xrange(0,len(snp_lists_files)):
@@ -150,12 +138,6 @@ def compare_snps(outputdir, SNP_files):
     with open(outputdir+"/snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
         f.write(r)
 
-    ### Printing stats
-    #for entry, value in stats.items():
-    #    print 'key: ',entry,'\t value: ',value
-    #print "\nSnps comparator OUTPUT: \n", r, "\n"
-    #SNPSs in total     #total number of snps per tool = len(all_files[0]), len(all_files[1]) ... len(all_files[x])
-    #collections.counter can easily find how many snps occur at one position, however not so relevant in comparison
 
     """
     TODO: count how many snp groups in ksnp?
