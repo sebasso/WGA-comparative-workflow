@@ -94,6 +94,7 @@ def find_SNPs_in_same_position(files, tool_names):
             else:
                 SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
 
+    # dict{ position {  tool_name{  filename: SNP  }}}
     return SNPs_same_position
 
 
@@ -127,11 +128,12 @@ def compare_snps(outputdir, SNP_files):
         stats["total_snps"].append(len(snp_lists_files[i])) #total_snps is the sum of snps even in the same position
         #TODO: incorporate SNP_group which will give unique snps after position
 
+    SNPs_loci = find_SNPs_in_same_position(snp_lists_files, tool_names)
+    stats["same_loci_snps"] = SNPs_loci
+
     stats["SNPs_per_genome"], grouped_snp_pos = count_snps_per_genome(snp_lists_files)
     print "\n"
     print "grouped_snp_pos: ",grouped_snp_pos,"\n"
-    SNPs_loci = find_SNPs_in_same_position(snp_lists_files, tool_names)
-    stats["same_loci_snps"] = SNPs_loci
 
     r = json.dumps(stats, indent=4, encoding="utf-8", sort_keys=True)
 

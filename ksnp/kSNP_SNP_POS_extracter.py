@@ -4,6 +4,7 @@ import sys
 import os
 
 """
+	- as long as there is no recombination 
 	line[2]=snp
 	line[3]=position
 	line[4]=strand
@@ -20,16 +21,20 @@ import os
 	EEE_FL93-939.fasta      9       C       gb|EF151502.1|gi|119633046|Eastern      F
 """
 
-def parseline(line):
+def parseline(line, reverse_complement):
 	newline = ""
 	sep="\t"
 	line=line.split(sep)
 	if len(line) == 6:
-		placeholder=line[3].split(" ")
-		line[5]=line[5][0:len(line[5])-1]
-		newline=line[4]+sep+placeholder[0]+sep+line[2]#+sep+line[5]+sep+placeholder[1]
+		line[5] = line[5][0:len(line[5])-1]
+		placeholder = line[3].split(" ")
+		if placeholder[1] == "F":
+			newline = line[4]+sep+placeholder[0]+sep+line[2]#+sep+line[5]+sep+placeholder[1]
+		else:
+			newline = line[4]+sep+placeholder[0]+sep+reverse_complement[line[2]]#+sep+line[5]+sep+placeholder[1]
+		
 	elif len(line) == 5:
-		newline=line[4]+sep+line[3]+sep+line[2]#+sep+line[4]
+		newline = line[4]+sep+line[3]+sep+line[2]#+sep+line[4]
 
 	return newline
 
@@ -40,12 +45,12 @@ def parsesnps():
 		inputSnps = f.readlines()
 
 	outputFormattedSnps = []
-
+	reverse_complement = {"A": "T", "T": "A","C": "G", "G": "C"}
 	for i in xrange(0,len(inputSnps)):
 		if inputSnps[i] in '\n':
 			continue
 		else:
-			outputFormattedSnps.append(parseline(inputSnps[i]))
+			outputFormattedSnps.append(parseline(inputSnps[i], reverse_complement))
 
 	snp_groups = inputSnps[len(inputSnps)-1].split("\t")[0]
 
