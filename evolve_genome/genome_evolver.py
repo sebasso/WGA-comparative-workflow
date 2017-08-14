@@ -129,16 +129,16 @@ def evolve_genome(args):
 			f.write(str(stats))
 
 
-		for position, snp in stats.iteritems():#TODO: increase position by 1
+		for position, snp in stats.iteritems():
 			snp_formatted_file += filename+str(i)+sep+str(position+1)+sep+snp+"\n" # position+1 because it starts at 0, since its more effective to have here with get_mutated_genome normalizing posistion before this loop will cause that method to fail
 
-	for pos, snp in mainsnps_grouped.iteritems():
-		snp_formatted_file += "reference"+sep+str(pos+1)+sep+genome[pos]+"\n" 
-	
+	#for pos, snp in mainsnps_grouped.iteritems():
+		#snp_formatted_file += "reference"+sep+str(pos+1)+sep+genome[pos]+"\n"
+
 	with open(statsfolders+os.sep+"reference_formatted_snps.tsv","w") as f:
 		f.write(snp_formatted_file)
 
-	#NB: can be removed, however move stat calcs to above, or just keep this as stat section
+
 	for leave in leaves_list:
 		identitiy, num_snps, common_bases = leave.calc_identitiy(genome)
 
