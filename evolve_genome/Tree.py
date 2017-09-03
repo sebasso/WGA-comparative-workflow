@@ -22,22 +22,16 @@ class Tree(object):
 
 	def get_leaves(self):
 		return self.leaves
-	
-	def normalize_positions(self):
-		
-		for x in xrange(0,len(self.leaves)):
-			d = self.leaves[x].get_snp_stats()
-			for key, value in d.items():
-				d[key+1] = d.pop(key)
 
 
 	"""
-	This works for evolution without recombination
+	This works for evolvement without recombination
 	"""
 	def create_fasttree_file(self, filename, outputdir, num_genomes):
 
 		# output UNIQUE snp positions in for self.leaves.snp_positions
-		leaves = self.get_leaves()
+		leaves = self.get_leaves()[0:num_genomes]
+
 		mainsnps = {} # main snp
 		for i in xrange(0,num_genomes):
 			mainsnps.update(leaves[i].snp_positions) # group all positions
@@ -48,8 +42,8 @@ class Tree(object):
 		mainsnps = sorted(mainsnps.iteritems()) #list
 		
 
-		output = [""]*len(leaves)
-		print "outputlen; ",len(output),"\n\n"
+		#output = [""]*len(leaves)
+		#print "outputlen; ",len(output),"\n\n"
 
 		#works since the snps are sorted ascendingly
 		common_snps = {} # all snp positions with their counts, remove?
@@ -61,21 +55,32 @@ class Tree(object):
 					else:
 						common_snps[pos] += 1
 					
-					output[count] += leave.snp_positions[pos] # add this to string
-				else:
-					output[count] += self.genome[pos] #add reference-snp as this will be the same in the genome
+					#output[count] += leave.snp_positions[pos] # add this to string
+				#else:
+				#	output[count] += self.genome[pos] #add reference-snp as this will be the same in the genome
 
 
 		print "Shared snps among genomes: ",len(common_snps.values())
 
-		tempout = ""
+		open(outputdir+"/fasttreeoutput.fasta", 'w').close()
+		with open(outputdir+"/fasttreeoutput.fasta", "a") as f:
+			genome_output = list(self.genome)
+			for count, leave in enumerate(leaves): #must have enumeration here
+				for pos, snp in leave.snp_positions.iteritems():
+					genome_output[pos] = snp
+
+				f.write( ">"+filename+str(count)+"\n"+''.join(genome_output)+"\n")
+
+
+		"""tempout = ""
 		for nr,out in enumerate(output):
 			tempout += ">"+filename+str(nr)+"\n"+out+"\n"
 
 		with open(outputdir+"/fasttreeoutput.fasta","w") as f:
-			f.write(tempout)
+			f.write(tempout)"""
 
 		return tmp
+
 
 
 
@@ -134,15 +139,16 @@ class Node(object):
 		#snp_interval = [1,2,3]
 		#num_snps = np.random.choice(snp_interval, p=[0.7, 0.21, 0.09])
 		for i in range(0,num_snps):
+
 			position = random.randrange(0, len(genome)) # pick position -> assumption: all positions in genome are equally prone to a snp (should be changed to differentiate core genome)
 			while position in snp_positions:
 				position = random.randrange(0, len(genome))
 
-			#snp = np.random.choice(nucleotides, p=nucleotide_probabilities)
-			snp = random.choice(nucleotides)
+			snp = np.random.choice(nucleotides, p=nucleotide_probabilities)
+			#snp = random.choice(nucleotides)
 			while snp == genome[position]: #make sure its not the same as already are there
-				#snp = np.random.choice(nucleotides, p=nucleotide_probabilities)
-				snp = random.choice(nucleotides)
+				snp = np.random.choice(nucleotides, p=nucleotide_probabilities)
+				#snp = random.choice(nucleotides)
 
 			mutations[position] = snp
 
@@ -159,7 +165,7 @@ class Node(object):
 	def get_mutated_genome(self, refgenome):
 		refgenome_list = list(refgenome)
 
-		for pos, snp in self.snp_positions.iteritems():
+		for pos, snp in self.snp_positions.items():
 			refgenome_list[pos] = snp
 
 		tmp = "".join(refgenome_list)
@@ -168,6 +174,7 @@ class Node(object):
 		ans, bens, common_bases =  self.calc_identitiy(refgenome) #TODO: remove when not in testing phase
 		assert a == ans
 		assert b == common_bases
+
 
 		return tmp
 
@@ -179,6 +186,17 @@ class Node(object):
  				c += 1
 
 		return ( (c / float(len(genome))) * 100), c
+
+
+	def create_fasttree_snps(self, refgenome):
+		fasta_format = ""
+		gap="-"
+		sorted(self.snp_positions.iterkeys())
+
+		for key in sorted(self.snp_positions.iterkeys()):
+			key, self.snp_positions[key] # sorted
+
+		return fasta_format
 
 
 	def get_snp_stats(self):

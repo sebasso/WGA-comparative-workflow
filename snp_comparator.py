@@ -8,8 +8,6 @@ from collections import Counter
 import json
 import re
 
-#from visualize import visualizer
-
 """
     further development:
     1. create own for snp_formatted files so galaxy only provides those as options
@@ -190,7 +188,6 @@ def compare_snps(outputdir, SNP_files):
 
     with open(outputdir+"/snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
         f.write(r)
-   # visualizer.visualize(tool_snp_count, tool_names)
 
     """
     TODO: count how many snp groups in ksnp?

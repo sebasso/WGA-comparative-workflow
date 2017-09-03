@@ -31,6 +31,7 @@ future:
 	2. parsnp -> find core-genome and mutate only that section of the genome.
 """
 
+@profile
 def evolve_genome(args):
 	refgenome = args.refgenome
 	filename = os.path.basename(args.refgenome)
@@ -85,19 +86,11 @@ def evolve_genome(args):
 	print "maxdiff_generation: ", maxdiff_generation
 	assert maxdiff_generation >= 1
 	tree = t.Tree(startdiff, maxdiff, generations, wait_generations, genome, maxdiff_generation, base_probabilities)
-	leaves_list = tree.get_leaves()
+	leaves_list = tree.get_leaves()[0:num_genomes]
 
 	print "done making structure"
 	print "num leaves: ", len(leaves_list)
-	mainsnps_grouped = tree.create_fasttree_file(filename, outputdir, num_genomes)
 
-	identities = []
-	max_snp_diff = 0
-	low = 10000000
-	high = 0
-
-	snp_positions = []
-	c = 0
 
 	#TODO: must override directory OR create date specific
 	if not os.path.exists(outputdir):
@@ -110,6 +103,16 @@ def evolve_genome(args):
 
 	if not os.path.exists(statsfolders):
 		os.makedirs(statsfolders)
+
+	mainsnps_grouped = tree.create_fasttree_file(filename, outputdir, num_genomes)
+
+	identities = []
+	max_snp_diff = 0
+	low = 10000000
+	high = 0
+
+	snp_positions = []
+	c = 0
 
 	outputfilename = outputdirgenomes+os.sep+filename
 

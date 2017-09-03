@@ -44,28 +44,26 @@ def robinson_fould(outputdir, input_trees):
     with open(outputdir+"/tree_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
         f.write(r)
 
-    if len(ete_trees[0]) > len(common_leaves) or len(ete_trees[1]) > len(common_leaves):
-        print "num leaves before pruning:", len(ete_trees[0]), len(ete_trees[1])
+    #print "num leaves before pruning:", len(ete_trees[0]), len(ete_trees[1])
 
-        for leave in ete_trees[0].iter_leaves():
-            if not leave.name in common_leaves:
-                leave.delete()
+    for leave in ete_trees[0].iter_leaves():
+        if not leave.name in common_leaves:
+            leave.delete()
 
-        for leave in ete_trees[1].iter_leaves():
-            if not leave.name in common_leaves:
-                leave.delete()
+    for leave in ete_trees[1].iter_leaves():
+        if not leave.name in common_leaves:
+            leave.delete()
 
-        print "num leaves after pruning:", len(ete_trees[0]), len(ete_trees[1])
-        for trees in ete_trees:
-            for i in xrange(0,len(ete_trees)):
-                with open(outputdir+"/"+treenames[i],"w") as f:
-                    f.write(ete_trees[i].write())
+    #print "num leaves after pruning:", len(ete_trees[0]), len(ete_trees[1])
+    for trees in ete_trees:
+        for i in xrange(0,len(ete_trees)):
+            with open(outputdir+"/"+treenames[i],"w") as f:
+                f.write(ete_trees[i].write())
 
 
 
 if __name__ == '__main__':
-    print "tree_comparator args:"
-    print str(sys.argv)+"\n"
+    print "tree_comparator args:\n"+  str(sys.argv)+"\n"
     files = sys.argv[1:]
     if len(files) <= 2:
         sys.stderr.write("tree_comparator requires a minimum of 2 trees")

@@ -260,20 +260,23 @@ then
     ./FastTreeMP_linux -slow -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
   fi
   cd $currdir
+  
   python $currdir/tree_comparator.py $simulation_res/parsnp $parsnp_output/parsnp.tree $simulated_dir/reference-tree.tree
+  file $ksnp_output/ksnp.tree
+  file $simulated_dir/reference-tree.tree
   python $currdir/tree_comparator.py $simulation_res/ksnp $ksnp_output/ksnp.tree $simulated_dir/reference-tree.tree
 
   touch $simulation_res/mergedtrees.tree
   cat $ksnp_output/ksnp.tree >> $simulation_res/mergedtrees.tree
   printf "\n" >> $simulation_res/mergedtrees.tree
   cat $simulated_dir/reference-tree.tree >> $simulation_res/mergedtrees.tree
-  java -jar $currdir/tree_comp/bin/TreeCmp.jar -m -d ms rf pd qt -i $simulation_res/mergedtrees.tree\
+  java -jar $currdir/tree_comp/bin/TreeCmp.jar -N -m -d ms rf pd qt -i $simulation_res/mergedtrees.tree\
    -o $simulation_res/ksnp/distances-refvsparsnp.txt -I -P
 
   cat $parsnp_output/parsnp.tree > $simulation_res/mergedtrees.tree
   printf "\n" >> $simulation_res/mergedtrees.tree
   cat $simulated_dir/reference-tree.tree >> $simulation_res/mergedtrees.tree
-  java -jar $currdir/tree_comp/bin/TreeCmp.jar -m -d ms rf pd qt -i $simulation_res/mergedtrees.tree\
+  java -jar $currdir/tree_comp/bin/TreeCmp.jar -N -m -d ms rf pd qt -i $simulation_res/mergedtrees.tree\
    -o $simulation_res/parsnp/distances-refvsksnp.txt -I -P
 
 
@@ -295,7 +298,7 @@ touch $run_specific/mergedtrees.tree
 cat $ksnp_output/ksnp.tree >> $run_specific/mergedtrees.tree
 printf "\n" >> $run_specific/mergedtrees.tree
 cat $parsnp_output/parsnp.tree >> $run_specific/mergedtrees.tree
-java -jar $currdir/tree_comp/bin/TreeCmp.jar -m -d ms rf pd qt -i $run_specific/mergedtrees.tree\
+java -jar $currdir/tree_comp/bin/TreeCmp.jar -N -m -d ms rf pd qt -i $run_specific/mergedtrees.tree\
  -o $run_specific/tree-distances.txt -I -P
 
 printf "\nTree comparison -> Done \n"
