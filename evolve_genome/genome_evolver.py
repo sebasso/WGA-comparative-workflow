@@ -31,7 +31,6 @@ future:
 	2. parsnp -> find core-genome and mutate only that section of the genome.
 """
 
-@profile
 def evolve_genome(args):
 	refgenome = args.refgenome
 	filename = os.path.basename(args.refgenome)
@@ -79,8 +78,10 @@ def evolve_genome(args):
 	print "refgenmelength: {} generations: {} max_snp_diff: {} wait_generations: {}".format(len(genome), generations, maxdiff, wait_generations)
 	#check that max % change is in bounds:
 	identitiy = (100 - (float(maxdiff)/len(genome) * 100))
+	print "identitiy: ", identitiy
+	print "percent: ", percent
 	assert identitiy < 100.0
-	assert identitiy > (100.0 - percent)
+	assert identitiy >=	 (100.0 - percent)
 
 	maxdiff_generation = int(maxdiff/generations)
 	print "maxdiff_generation: ", maxdiff_generation

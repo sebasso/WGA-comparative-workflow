@@ -63,14 +63,21 @@ class Tree(object):
 		print "Shared snps among genomes: ",len(common_snps.values())
 
 		open(outputdir+"/fasttreeoutput.fasta", 'w').close()
+		print len(self.genome)
+		"""
+		TODO: 
+		* check if snp_positions_ are valid
+		* check why some lines are 160
+		
+		"""
+
+		genome_output = list(self.genome)
 		with open(outputdir+"/fasttreeoutput.fasta", "a") as f:
-			genome_output = list(self.genome)
 			for count, leave in enumerate(leaves): #must have enumeration here
 				for pos, snp in leave.snp_positions.iteritems():
 					genome_output[pos] = snp
-
+				#out += ">"+filename+str(count)+"\n"''+''.join(genome_output)+"\n"
 				f.write( ">"+filename+str(count)+"\n"+''.join(genome_output)+"\n")
-
 
 		"""tempout = ""
 		for nr,out in enumerate(output):
@@ -141,7 +148,7 @@ class Node(object):
 		for i in range(0,num_snps):
 
 			position = random.randrange(0, len(genome)) # pick position -> assumption: all positions in genome are equally prone to a snp (should be changed to differentiate core genome)
-			while position in snp_positions:
+			while position in snp_positions or genome[position] == "\n":
 				position = random.randrange(0, len(genome))
 
 			snp = np.random.choice(nucleotides, p=nucleotide_probabilities)

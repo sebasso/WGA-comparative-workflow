@@ -1,5 +1,5 @@
 #!/bin/bash
-#intended for linux/macOS
+#compatible for linux/macOS
 
 #USAGE: [-ref path_to_referencegenome] [-genomedir path_to_genome_directory] [-CPUS [num]]
 #example
@@ -106,11 +106,6 @@ then
   exit_module
 fi
 
-if [ -z "$genome_path"  ] && [ ! -d "$genome_path" ];
-then
-  printf "Genome directory genome must be supplied\n -genome_dir path_to_genome_directory"
-  exit_module
-fi
 #optional option - no paramater set default=4
 if [ -z "$CPUS" ];
 then
@@ -165,6 +160,12 @@ then
   else
     python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --nucleotide_probabilities $probabilities
   fi
+fi
+
+if [ -z "$genome_path"  ] && [ ! -d "$genome_path" ];
+then
+  printf "Genome directory genome must be supplied\n -genome_dir path_to_genome_directory"
+  exit_module
 fi
 
 #### preprocessing of inputfiles(ksnp ONLY((Galaxy inputformat legacy))
