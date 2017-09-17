@@ -249,8 +249,9 @@ then
   printf "\n"
   mkdir -p $simulation_res/ksnp
   mkdir -p $simulation_res/parsnp
-  python $currdir/snp_comparator.py $simulation_res/ksnp $ksnp_output/kSNP_SNPs_POS_formatted.tsv $snp_stats/reference_formatted_snps.tsv
-  python $currdir/snp_comparator.py $simulation_res/parsnp $parsnp_output/parsnp_snps_sorted.tsv $snp_stats/reference_formatted_snps.tsv
+  numberofgenomes=`ls $genome_path | wc -l`
+  python $currdir/snp_comparator.py $numberofgenomes $simulation_res/ksnp $ksnp_output/kSNP_SNPs_POS_formatted.tsv $snp_stats/reference_formatted_snps.tsv
+  python $currdir/snp_comparator.py $numberofgenomes $simulation_res/parsnp $parsnp_output/parsnp_snps_sorted.tsv $snp_stats/reference_formatted_snps.tsv
 
   cd $currdir/common-sw
   if [ "$OS" == "Darwin" ];
@@ -286,7 +287,8 @@ fi
 
 ##### COMPARATORS #######
 ##### SNP comparison
-python $currdir/snp_comparator.py $run_specific $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_snps_sorted.tsv
+numberofgenomes=`ls $genome_path | wc -l`
+python $currdir/snp_comparator.py $numberofgenomes $run_specific $ksnp_output/kSNP_SNPs_POS_formatted.tsv $parsnp_output/parsnp_snps_sorted.tsv
 printf "SNP comparison -> Done \n"
 date
 ### ML tree comparison
