@@ -1,3 +1,4 @@
+run_example
 ABEL:
 ecoli run:
 sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/mastertools/Parsnp-Linux64-v1.2/refs/BA000007.2-coli-O157-H7.fasta \
@@ -16,3 +17,18 @@ bash workflowmanager.sh -ref /usit/abel/u1/sebasso/ksnp_small/EEE_Florida91-4697
 
 LOCAL:
 bash workflowmanager.sh -ref ~/Downloads/Example1/Genomes/EEE_Florida91-4697.fasta -genomedir ~/Downloads/Example1/Genomes -CPUS 4
+
+
+SIMULATIONS:
+run simulation on abel:
+campbyo:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 5 -num_genomes 40 -name sim_campy_5p_40g
+
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 1 -num_genomes 40 -name sim_campy_1p_40g
+
+
+ecoli:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 1 -num_genomes 40 -name sim_ecoli_1p_40g
+
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 5 -num_genomes 40 -name sim_ecoli_5_40g
+
