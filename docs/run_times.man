@@ -1,0 +1,20 @@
+Comparison:
+	- Campylobacter assemblies
+		2 hours and 33 minutes
+
+	- Campylobacter reads(ksnp only):
+		running
+
+	- Ecoli assemblies
+		4 hours and 14 minutes
+
+	- Ecoli reads(ksnp only):
+		needs parser for reads as they are in .gz files
+
+
+Simulation:
+	- Campylobacter reference with 40 genomes
+		20 minutes ??? 
+
+	- Ecoli reference with 40 genome
+		5 hours and 10 minutes

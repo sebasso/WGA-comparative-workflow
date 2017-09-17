@@ -7,7 +7,7 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3422086/
 metrics explained:(only unrooted)
 split = Each internal edge of a binary phyloge- netic tree divides the set of considered species into two 			related groups.
 example:
-	Two  splits can then be compared using an arbitrary metric h defined on a set of splits. The metric h quantifies the level of dissimilarity of two arbitrary splits.
+	Two splits can then be compared using an arbitrary metric h defined on a set of splits. The metric h quantifies the level of dissimilarity of two arbitrary splits.
 
 SPLIT based distances:
 o ms – the Matching Split distance (Bogdanowicz and Giaro 2012)
