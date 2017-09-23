@@ -14,7 +14,7 @@ Comparison:
 
 Simulation:
 	- Campylobacter reference with 40 genomes
-		20 minutes ??? 
+		1 hours 30 minutes 
 
 	- Ecoli reference with 40 genome
 		5 hours and 10 minutes
