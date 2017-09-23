@@ -143,7 +143,7 @@ def snp_positional_plus_allgenomes_count_stats(SNPs_same_position):
         if len(toolsnpdict) == 2:
             tool1 = set(toolsnpdict[0][1].items())
             tool2 = set(toolsnpdict[1][1].items())
-            intersection = tool1 & tool2
+            intersection = tool1 & tool2 #compares filename and 'SNP' eks: ('EEE_Florida91-4697.fasta3', 'T') and ('EEE_Florida91-4697.fasta3', 'T') will match not ('EEE_Florida91-4697.fasta3', 'G')
             common_snps += len(intersection)
 
     return common_snps
@@ -202,5 +202,4 @@ if __name__ == '__main__':
     if len(files) <= 2:
         sys.stderr.write("snp_comparator requires a minimum of 2 formatted SNP lists with their respective position and file name")
         exit(1)
-    compare_snps(num_genomes, files[0], files[1:])
-
+    compare_snps(int(num_genomes), files[0], files[1:])
