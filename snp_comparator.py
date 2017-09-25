@@ -15,6 +15,7 @@ import re
 """
 
 def readfiles(files):#files[0]=ksnp, files[1]=parsnp
+    print files
     all_files = []
     tool_names = []
     snp_group_count = []
@@ -136,17 +137,23 @@ def snp_postional_count_stats(SNPs_same_position, tool_names):
 
 
 def snp_positional_plus_allgenomes_count_stats(SNPs_same_position):
+    common_snps_results = {}
 
     common_snps = 0
     for pos,tooldict in SNPs_same_position.iteritems():
+        tmp = []
         toolsnpdict = tooldict.items()
         if len(toolsnpdict) == 2:
-            tool1 = set(toolsnpdict[0][1].items())
-            tool2 = set(toolsnpdict[1][1].items())
-            intersection = tool1 & tool2 #compares filename and 'SNP' eks: ('EEE_Florida91-4697.fasta3', 'T') and ('EEE_Florida91-4697.fasta3', 'T') will match not ('EEE_Florida91-4697.fasta3', 'G')
-            common_snps += len(intersection)
+            #tool1 = set(toolsnpdict[0][1].items())
+            tool2 = toolsnpdict[1][1].items()
+            for entry in toolsnpdict[0][1].iteritems():
+                if entry in tool2:
+                    common_snps += 1
+                    tmp.append(entry)
+        if len(tmp) > 0:
+            common_snps_results[pos] = tmp
 
-    return common_snps
+    return common_snps, common_snps_results
 
 
 def find_total_snps(SNPs_loci, tool_names):
@@ -175,14 +182,16 @@ def compare_snps(num_genomes, outputdir, SNP_files):
 
     stats["total_SNPs_per_genome"] = snps_per_genome_total(SNPs_loci, tool_names)
 
-    stats["SNPs_per_genome_per_tool"] = snps_per_genome_per_tool(SNPs_loci, tool_names)
+    stats["SNPs_per_genome_per_tool"] = snps_per_genome_per_tool(SNPs_loci, tool_names)#TODO what is this?:
 
     stats["snp_position_counts"] = snp_postional_count_stats(SNPs_loci, tool_names)
 
     total_snps = find_total_snps(SNPs_loci,tool_names)
-    total_snps["common_snps_all"] = snp_positional_plus_allgenomes_count_stats(SNPs_loci)
+    total_snps["common_snps_all"], common_snps_overview = snp_positional_plus_allgenomes_count_stats(SNPs_loci)
 
     stats["total_snps"] = total_snps
+    
+    stats["_common_snps_overview_"] = common_snps_overview
 
     r = json.dumps(stats, indent=4, encoding="utf-8", sort_keys=True)
 
@@ -197,9 +206,11 @@ def compare_snps(num_genomes, outputdir, SNP_files):
 if __name__ == '__main__':
     print "Snp comparator @args:"
     print str(sys.argv)+"\n"
-    num_genomes = sys.argv[1]
-    files = sys.argv[2:]
-    if len(files) <= 2:
+
+    if len(sys.argv) < 4:
         sys.stderr.write("snp_comparator requires a minimum of 2 formatted SNP lists with their respective position and file name")
         exit(1)
-    compare_snps(int(num_genomes), files[0], files[1:])
+    num_genomes = sys.argv[1]
+    outputdir = sys.argv[2]
+    files = sys.argv[3:]
+    compare_snps(int(num_genomes), outputdir, files)

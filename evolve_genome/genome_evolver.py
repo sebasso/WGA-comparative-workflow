@@ -45,10 +45,15 @@ def evolve_genome(args):
 	with open(refgenome,"r") as f:
 		meta = f.readline()
 		genome = f.read()
+	num_newlines = -1
+	for char in genome:
+		if char == '\n':
+			num_newlines += 1
 
+	print "newlines: ",num_newlines
 	# sanitize input:
 	startdiff = 0
-	maxdiff = int(float(len(genome)) * (percent/100.0)) # in characters
+	maxdiff = int(float(len(genome)-num_newlines) * (percent/100.0)) # in characters
 	generations = int(log(float(num_genomes))/log(2.0))
 	assert generations > 0
 
@@ -75,9 +80,14 @@ def evolve_genome(args):
 	2. medium
 	3. high(aggressive)
 	"""
-	print "refgenmelength: {} generations: {} max_snp_diff: {} wait_generations: {}".format(len(genome), generations, maxdiff, wait_generations)
+	print "refgenmelength: {} generations: {} max_snp_diff: {} wait_generations: {}".format(len(genome)-num_newlines, generations, maxdiff, wait_generations)
 	#check that max % change is in bounds:
-	identitiy = (100 - (float(maxdiff)/len(genome) * 100))
+	#identitiy = (100 - (float(maxdiff)/float(((len(genome)-num_newlines) * 100))))
+
+	identitiy = 100 - (float(maxdiff)/float((len(genome)-num_newlines)) *100)
+	#print "id2: ", id2
+	#-(maxdiff/refgenmelength)*100
+	#100-(82074/1641482)*100
 	print "identitiy: ", identitiy
 	print "percent: ", percent
 	assert identitiy < 100.0
@@ -109,7 +119,7 @@ def evolve_genome(args):
 
 	identities = []
 	max_snp_diff = 0
-	low = 10000000
+	low = sys.maxint
 	high = 0
 
 	snp_positions = []
@@ -118,7 +128,7 @@ def evolve_genome(args):
 	outputfilename = outputdirgenomes+os.sep+filename
 
 	snp_formatted_file = "reference\n"
-	snp_formatted_file += str(len(mainsnps_grouped))+"\n"
+	snp_formatted_file += str(len(mainsnps_grouped))+"\n"# TODO: check if this is right, what is a snp group?
 	sep = "\t"
 	for i in xrange(0, num_genomes):
 		leave_genome = leaves_list[i].get_mutated_genome(genome)
