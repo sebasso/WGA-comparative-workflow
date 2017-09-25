@@ -180,8 +180,7 @@ set startseconds=`date +%s`
 
 echo "input fasta_list: $fasta_list"
 echo "output directory: $dir"
-echo "kmer_size=$k"
-printf "kmer_size=$k"
+printf "kmer_size=$k\n"
 echo "annotate_list file: $annotate_list"
 
 if ($all_annotations == 1) then

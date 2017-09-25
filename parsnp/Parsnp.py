@@ -1176,7 +1176,7 @@ if __name__ == "__main__":
     p = subprocess.Popen([sys.executable,pyfile,inputfile, outputDir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
     sys.stderr.write("format_vcf stderr:\n"+stderr)
-    sys.stdout.write("format_vcf stdout:\n"+stdout)
+    sys.stdout.write("format_vcf stdout:\n"+stdout+"\n\n\n")
     #returncode = p.wait()
     returncode = p.returncode
     if returncode > 0:
