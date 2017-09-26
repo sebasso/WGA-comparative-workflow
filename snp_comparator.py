@@ -149,7 +149,7 @@ def snp_positional_plus_allgenomes_count_stats(SNPs_same_position):
             for entry in toolsnpdict[0][1].iteritems():
                 if entry in tool2:
                     common_snps += 1
-                    tmp.append(entry)
+                    tmp.append(dict(entry))
         if len(tmp) > 0:
             common_snps_results[pos] = tmp
 
