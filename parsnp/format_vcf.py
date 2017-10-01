@@ -30,6 +30,7 @@ def parse_vcf():
         #print"line: ",line
         l = line.rstrip().split(sep)
         pos = l[1]
+        surrounding_bases = l[2]
         ref = l[3]
         altbase = l[4]
         #loop genomes per linje og de som er = 1 lagrer vi til:
@@ -39,7 +40,7 @@ def parse_vcf():
             alt_num = int(snp_present)
             if alt_num > 0:
                 alt_bases = altbase.split(",")
-                output += filename+sep+pos+sep+alt_bases[alt_num-1]+"\n" # DON't add those who have similar as reference genome as that isnt a snp
+                output += filename+sep+pos+sep+alt_bases[alt_num-1]+sep+surrounding_bases+"\n" # DON't add those who have similar as reference genome as that isnt a snp
                 #if len(num_alts) > 1:
                  #   output += filename+sep+pos+sep+altbase+"\n" # DON't add those who have similar as reference genome as that isnt a snp
                 #if len(num_alts) == 1:

@@ -20,7 +20,6 @@ import os
 	to:
 	EEE_FL93-939.fasta      9       C       gb|EF151502.1|gi|119633046|Eastern      F
 """
-
 def parseline(line, reverse_complement):
 	newline = ""
 	sep="\t"
@@ -29,12 +28,12 @@ def parseline(line, reverse_complement):
 		line[5] = line[5][0:len(line[5])-1]
 		placeholder = line[3].split(" ")
 		if placeholder[1] == "F":
-			newline = line[4]+sep+placeholder[0]+sep+line[2]#+sep+line[5]+sep+placeholder[1]
+			newline = line[4]+sep+placeholder[0]+sep+line[2]+sep+line[1] #+sep+line[5]+sep+placeholder[1]
 		else:
-			newline = line[4]+sep+placeholder[0]+sep+reverse_complement[line[2]]#+sep+line[5]+sep+placeholder[1]
+			newline = line[4]+sep+placeholder[0]+sep+reverse_complement[line[2]]+sep+line[1] #+sep+line[5]+sep+placeholder[1]
 		
 	elif len(line) == 5:
-		newline = line[4]+sep+line[3]+sep+line[2]#+sep+line[4]
+		newline = line[4]+sep+line[3]+sep+line[2]+sep+line[1] #+sep+line[4]
 
 	return newline
 
@@ -54,7 +53,7 @@ def parsesnps():
 
 	snp_groups = inputSnps[len(inputSnps)-1].split("\t")[0]
 
-	print "num_snp_groups: "+str(int(snp_groups)+1)#starts at 0
+	print "num_snp_groups: "+str(int(snp_groups)+1) # starts at 0
 
 	currpath=os.getcwd()
 	outputfile=currpath+"/"+"kSNP_SNPs_POS_formatted.tsv"

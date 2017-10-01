@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# usage: python snp_comparator.py comma separated list of SNP formatted files
+# usage: python snp_comparator.py comma separated list of SNP formatted files(.tsv)
 import sys
 import os
 from collections import Counter
@@ -14,8 +14,7 @@ import re
     - modify config/datatypes_conf.xml
 """
 
-def readfiles(files):#files[0]=ksnp, files[1]=parsnp
-    print files
+def readfiles(files):
     all_files = []
     tool_names = []
     snp_group_count = []
@@ -40,35 +39,37 @@ def remove_most_frequent_base_per_position_ksnp_if_all_genomes_have_snp(num_geno
                  # snpdict.iteritems() key=filname value= snps
                 snp_mapping = snpdict.items()
                 snp_counts = Counter(map(lambda x: x[1], snp_mapping)) # count snps
-                most_frequent_snp = snp_counts.most_common(1)[0][0] # fetch most frequent snp
-
-                for filename, snp in snp_mapping: #remove most frequent in genomes
-                    if snp == most_frequent_snp:
-                        del snpdict[filename]
+                most_frequent_snps = snp_counts.most_common(2)# fetch most frequent snp
+                most_frequent_snp_one = most_frequent_snps[0] # [i] = list element of ([0] = Snps, [1] = position)
+                most_frequent_snp_two = most_frequent_snps[1]
+                if most_frequent_snp_one[1] > most_frequent_snp_two[1]:
+                    for filename, snp in snp_mapping: #remove most frequent in genomes
+                        if snp == most_frequent_snp_one[1]:
+                            del snpdict[filename]
 
     return SNPs_loci
 
 
 def find_SNPs_in_same_position(num_genomes, files, tool_names):
     SNPs_same_position = {}
-
     for i, snp_file in enumerate(files):
         for j in xrange(0,len(snp_file)):
             l1 = snp_file[j].rstrip().split("\t")
             if l1[1] != "x": # unknown position snp from ksnp, still relevant when constructing tree from alignment there it is here
                 key = int(l1[1])
+                #print "x != key: ",key
                 if key in SNPs_same_position:
-                    if tool_names[i] in SNPs_same_position[key]:
-                        if l1[0] in SNPs_same_position[key][tool_names[i]]:
+                    if tool_names[i] in SNPs_same_position[key]: # same position, existing tool, new snp
+                        if l1[0] in SNPs_same_position[key][tool_names[i]]: # if not first snp on pos key as toolname i
                             SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
-                        else:
+                        else: # if first snp on pos key as toolname i
                             SNPs_same_position[key][tool_names[i]][l1[0]] = {}
                             SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
-                    else:
+                    else: # same position, new tool && new snp
                         SNPs_same_position[key][tool_names[i]] = {}
                         SNPs_same_position[key][tool_names[i]][l1[0]] = {}
                         SNPs_same_position[key][tool_names[i]][l1[0]] = l1[2]
-                else:
+                else: #new postion, tool and snp
                     SNPs_same_position[key] = {}
                     SNPs_same_position[key][tool_names[i]] = {}
                     SNPs_same_position[key][tool_names[i]][l1[0]] = {}
@@ -99,7 +100,7 @@ def snps_per_genome_per_tool(SNPs_loci, tool_names):
         SNPs_per_genome = Counter()
         for pos,tooldict in SNPs_loci.iteritems():
             for toolname, snpdict in tooldict.iteritems():#snpdict key=filename, value = snp
-                if toolname == tool: #TODO: Change this to be valid for all
+                if toolname == tool:
                     for filename in snpdict.iterkeys():
                         SNPs_per_genome[filename] += 1
 
@@ -131,7 +132,7 @@ def snp_postional_count_stats(SNPs_same_position, tool_names):
         tool_snp_percent = float(tool_snp_count[common_positions])/tool_snp_count[tool]*100
         tool_snp_percent_of_common_snps.append(tool+" "+str(tool_snp_percent))
 
-    tool_snp_count["common_snp_percentage_of_common_snps"] = tool_snp_percent_of_common_snps
+    tool_snp_count["common_snp_percentage_of_common_snps_on_same_position"] = tool_snp_percent_of_common_snps
 
     return tool_snp_count
 
@@ -149,7 +150,7 @@ def snp_positional_plus_allgenomes_count_stats(SNPs_same_position):
             for entry in toolsnpdict[0][1].iteritems():
                 if entry in tool2:
                     common_snps += 1
-                    tmp.append(dict(entry))
+                    tmp.append(entry)
         if len(tmp) > 0:
             common_snps_results[pos] = tmp
 
@@ -184,19 +185,22 @@ def compare_snps(num_genomes, outputdir, SNP_files):
 
     stats["SNPs_per_genome_per_tool"] = snps_per_genome_per_tool(SNPs_loci, tool_names)#TODO what is this?:
 
-    stats["snp_position_counts"] = snp_postional_count_stats(SNPs_loci, tool_names)
+    stats["snp_position_counts_per_tool"] = snp_postional_count_stats(SNPs_loci, tool_names)
 
     total_snps = find_total_snps(SNPs_loci,tool_names)
-    total_snps["common_snps_all"], common_snps_overview = snp_positional_plus_allgenomes_count_stats(SNPs_loci)
+    total_snps["common_snps_on_postion_and_genome"], common_snps_overview = snp_positional_plus_allgenomes_count_stats(SNPs_loci)
 
     stats["total_snps"] = total_snps
     
-    stats["_common_snps_overview_"] = common_snps_overview
+    #stats["_common_snps_overview_"] = common_snps_overview
 
     r = json.dumps(stats, indent=4, encoding="utf-8", sort_keys=True)
 
-    with open(outputdir+"/snps_stats.json","w") as f: #warning will write this relative to exection path - sys.executables
+    with open(outputdir+"/snps_stats.json","w") as f:
         f.write(r)
+
+    with open(outputdir+"/common_snps_position_and_snp.json","w") as f:
+        f.write(json.dumps(common_snps_overview, indent=4, encoding="utf-8", sort_keys=True))
 
     """
     TODO: count how many snp groups in ksnp?

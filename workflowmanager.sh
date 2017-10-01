@@ -153,16 +153,26 @@ then
   mkdir $genome_path
   snp_stats=$simulated_dir/snp_stats
   mkdir $snp_stats
+  printf "pwd: "
+  pwd
 
-  if [ -z "$probabilities" ]; #TODO: RUN fasttree on $simulated_dir/fasttreeoutput.fasta and output it to $simulated_dir
+  mummer=ksnp
+  if [ "$OS" == "Darwin" ];
   then
-    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir
+    mummer=$mummer/mac_specific/mummer
+  elif [ "$OS" == "Linux" ]; then
+    mummer=$mummer/linux_specific/mummer
+  fi
+
+  if [ -z "$probabilities" ]; # Runs fasttree on $simulated_dir/fasttreeoutput.fasta and output it to $simulated_dir
+  then
+    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --mummer $mummer
   else
-    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --nucleotide_probabilities $probabilities
+    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --nucleotide_probabilities $probabilities --mummer $mummer
   fi
 fi
 
-if [ -z "$genome_path"  ] && [ ! -d "$genome_path" ];
+if [ -z "$genome_path"  ] && [ ! -d "$genome_path" ];
 then
   printf "Genome directory genome must be supplied\n -genome_dir path_to_genome_directory"
   exit_module
@@ -242,8 +252,8 @@ printf "\nrun specific: $run_specific\n"
 if [ ! -z "$simulate" ];
 then
   printf "Simulation started:\n"
-  simulation_res=$run_specific/simulation # TODO: fix output
-  #TODO: fix snp format from simulator
+  simulation_res=$run_specific/simulation
+
   printf "snp_statsdirectory:",$snp_stats
   ls $snp_stats
   printf "\n"
@@ -257,9 +267,9 @@ then
   if [ "$OS" == "Darwin" ];
   then
     printf "currdir: "$currdir
-    ./FastTreeMP_osx -slow -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
+    ./FastTreeMP_osx -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
   elif [ "$OS" == "Linux" ]; then
-    ./FastTreeMP_linux -slow -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
+    ./FastTreeMP_linux -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
   fi
   cd $currdir
   
@@ -324,6 +334,7 @@ mv $parsnp_output/parsnp.ggr $run_specific
 mv $parsnp_output/parsnp.xmfa $run_specific
 mv $parsnp_output/parsnp.snps.vcf $run_specific
 mv $parsnp_output/parsnp_snps_sorted.tsv $run_specific
+mv $parsnp_output/parsnp.snps.mblocks $run_specific
 
 ksnp_logs=$run_specific/ksnp_logs
 parsnp_logs=$run_specific/parsnp_logs

@@ -33,19 +33,44 @@ class Tree(object):
 		leaves = self.get_leaves()[0:num_genomes]
 
 		mainsnps = {} # main snp
+		total_number_of_snps = 0
 		for i in xrange(0,num_genomes):
-			mainsnps.update(leaves[i].snp_positions) # group all positions
-		#for leave in leaves:
-			#leave.snp_positions # snps
-		#	mainsnps.update(leave.snp_positions) # group all positions
+			snp_positions = leaves[i].snp_positions
+			print "size: ", len(snp_positions)
+			total_number_of_snps += len(snp_positions)
+			mainsnps.update(snp_positions) # group all positions
 		tmp = mainsnps.copy()
 		mainsnps = sorted(mainsnps.iteritems()) #list
+		print "Total size: ", len(mainsnps)
+		open(outputdir + "/fasttreeoutput.fasta", 'w').close()
+		max_snp_length = len(mainsnps)
+
+		with open(outputdir + "/fasttreeoutput.fasta", "a") as f:
+			for i in xrange(0, num_genomes):
+				curr_genome = [None] * max_snp_length
+				for k in xrange(0, max_snp_length):
+					pos = mainsnps[k][0]
+					snp = mainsnps[k][1]
+					if pos in leaves[i].snp_positions:  # hashlookup
+						curr_genome[k] = snp
+
+				for j in xrange(0, max_snp_length):
+					if curr_genome[j] is None:
+						curr_genome[j] = "-" #what fasttree requires as gap ref: http://www.microbesonline.org/fasttree/
+
+				f.write(">" + filename + str(i) + "\n" + ''.join(curr_genome) + "\n")
+
+		"""
+		This generates the each a whole genome with the snps. It is too memory consuming to be used as for large
+		sequences it causes fasttree to use above > 60 GB of ram due the scaling of large sequences.
+		Instead a strategy based on snps solely is chosen, this solution only outputs the all snp each
+		genome contains and adds gaps between snps. It doesnt care if the two snps are 100 bases apart
+		it treats it as one as all these 100 bases are similar it wont effect fasttree and greatly reduce
+		memory consumtion and computation time. 
 		
-
-		#output = [""]*len(leaves)
-		#print "outputlen; ",len(output),"\n\n"
-
-		#works since the snps are sorted ascendingly
+		2. It also makes it more realistic when comapring to ksnp and parsnp as it defines
+			the output to fasttree in the same manner
+		
 		common_snps = {} # all snp positions with their counts, remove?
 		for pos, snp in mainsnps: # for snp position there is check which leaves it is in, if its not in the leave append base from reference_genome
 			for count, leave in enumerate(leaves): #must have enumeration here
@@ -54,45 +79,29 @@ class Tree(object):
 						common_snps[pos] = 1
 					else:
 						common_snps[pos] += 1
-					
-					#output[count] += leave.snp_positions[pos] # add this to string
-				#else:
-				#	output[count] += self.genome[pos] #add reference-snp as this will be the same in the genome
-
 
 		print "Shared snps among genomes: ",len(common_snps.values())
 
-		open(outputdir+"/fasttreeoutput.fasta", 'w').close()
-		print len(self.genome)
-		"""
-		TODO: 
-		* check if snp_positions_ are valid
-		* check why some lines are 160
-		
-		"""
+		open(outputdir+"/fasttreeoutput2.fasta", 'w').close()
 
 		genome_output = list(self.genome)
-		with open(outputdir+"/fasttreeoutput.fasta", "a") as f:
+		with open(outputdir+"/fasttreeoutput2.fasta", "a") as f:
 			for count, leave in enumerate(leaves): #must have enumeration here
 				for pos, snp in leave.snp_positions.iteritems():
 					genome_output[pos] = snp
-				#out += ">"+filename+str(count)+"\n"''+''.join(genome_output)+"\n"
 				f.write( ">"+filename+str(count)+"\n"+''.join(genome_output)+"\n")
+		"""
 
-		"""tempout = ""
-		for nr,out in enumerate(output):
-			tempout += ">"+filename+str(nr)+"\n"+out+"\n"
+		return tmp, total_number_of_snps
 
-		with open(outputdir+"/fasttreeoutput.fasta","w") as f:
-			f.write(tempout)"""
-
-		return tmp
-
-
+	"""
+	max snpp diff er lengden per genome
+	- ha med snippene og - ellers.	
+	"""
 
 
 class Node(object):
-	"""docstring for Node"""
+	"""Represents internal and leaf nodes"""
 	def __init__(self, *args):
 		self.snp_diff = args[0]
 		self.max_snp_diff = args[1]
