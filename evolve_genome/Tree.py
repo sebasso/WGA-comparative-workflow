@@ -36,12 +36,13 @@ class Tree(object):
 		total_number_of_snps = 0
 		for i in xrange(0,num_genomes):
 			snp_positions = leaves[i].snp_positions
-			print "size: ", len(snp_positions)
+			print "Num snps for genome: ",i," : ", len(snp_positions)
 			total_number_of_snps += len(snp_positions)
 			mainsnps.update(snp_positions) # group all positions
 		tmp = mainsnps.copy()
 		mainsnps = sorted(mainsnps.iteritems()) #list
-		print "Total size: ", len(mainsnps)
+		print "Total number of snps: ", len(mainsnps)
+
 		open(outputdir + "/fasttreeoutput.fasta", 'w').close()
 		max_snp_length = len(mainsnps)
 
@@ -111,7 +112,6 @@ class Node(object):
 		self.wait_generations = args[5]
 		#self.genome = args[6] #string
 		self.snp_positions = args[7].copy() # every mutation must be local
-
 
 		if self.generation <= self.max_generations: # as long as more generations are needed to achienge number of genomes as desired
 			#this enables mutation to start WHEN there is only mutation per generation if percent identitiy is very high and sequence very short.
@@ -190,7 +190,6 @@ class Node(object):
 		ans, bens, common_bases =  self.calc_identitiy(refgenome) #TODO: remove when not in testing phase
 		assert a == ans
 		assert b == common_bases
-
 
 		return tmp
 

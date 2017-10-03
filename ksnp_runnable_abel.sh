@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### SBATCH vars
-#SBATCH --job-name=KSNP-campylobacter-CPU-6-10GB
+#SBATCH --job-name=campylobacter-ksnp-CPU-6-10GB
 #
 # Project:
 #SBATCH --account=nn9305k
@@ -24,7 +24,7 @@ module purge
 module load python2
 
 
-genomedir=/work/projects/nn9305k/compgenomes/rawdata/campy_reads
+genomedir=/work/projects/nn9305k/compgenomes/rawdata/campy_reads_fasta
 input_files=""
 for f in $genomedir/*
 do
@@ -42,4 +42,4 @@ kSNP_path=$currdir/ksnp
 
 cd $kSNP_path
 ./kSNP3 -in $input_files -outdir $ksnp_output -k 13 -CPU 12 \
--kchooser "1" -ML -path $kSNP_path  > $ksnp_output/stdout  2> $ksnp_output/stderr
+-kchooser "1" -ML -path $kSNP_path  > $ksnp_output/stdout  2> $ksnp_output/stderroutput/stderr 

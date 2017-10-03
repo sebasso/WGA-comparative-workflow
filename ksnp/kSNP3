@@ -167,6 +167,7 @@ if ($?kchooser) then
     printf "Setting kmer_size to: $k"
     if ( "$k" == "" ) then
       set k=13
+      printf "Defaults to: $k"
     endif
   endif
 else
@@ -378,8 +379,6 @@ foreach f (fsplit*)
     cat Dir.$f/SNPs.*.mers >! Dir.$f/SNPs
 end
 
-# Run mummer to find the position of each SNP in the finished genomes. Don't do this for unassembled draft genomes or merged raw read genomes, since positional information is not informative.
-
 if (-s annotate_list) then
     echo "Finding SNP positions in finished genomes using mummer."
     date
@@ -439,7 +438,7 @@ $kSNP/SNPs_all_2_fasta_matrix3 SNPs_all SNPs_all_matrix.fasta SNPs_all_matrix
 
 ## Building ML FastTree tree from all SNPs
 if ($?ML) then
- $kSNP/$os_path/FastTreeMP -nt -gtr -slow SNPs_all_matrix.fasta >!  ksnp.tree
+ $kSNP/$os_path/FastTreeMP -nt -slow -gtr SNPs_all_matrix.fasta >!  ksnp.tree
  printf "ML\n" >> tree_list1
  printf "ML\n" >> tree_list2
 endif
@@ -449,6 +448,6 @@ wait
 
 
 #cleanup
-rm $kSNP/in_list
-rm $kSNP/annotate_genomes
-rm $kSNP/fasta_list
+#rm $kSNP/in_list
+#rm $kSNP/annotate_genomes
+#rm $kSNP/fasta_list

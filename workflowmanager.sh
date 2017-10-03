@@ -140,10 +140,12 @@ then
   if [ -z "$percent" ];
   then
     percent=2
+    printf "percent = 2% \n"
   fi
   if [ -z "$num_genomes" ];
   then
     num_genomes=30
+    printf "num_genomes = 30 \n"
   fi
   printf "\ncurrdir: "$currdir"\n"
   simulated_dir=$currdir/evolve_genome/simulated_genomes/$NOW$jobname
@@ -153,8 +155,6 @@ then
   mkdir $genome_path
   snp_stats=$simulated_dir/snp_stats
   mkdir $snp_stats
-  printf "pwd: "
-  pwd
 
   mummer=ksnp
   if [ "$OS" == "Darwin" ];
@@ -166,9 +166,9 @@ then
 
   if [ -z "$probabilities" ]; # Runs fasttree on $simulated_dir/fasttreeoutput.fasta and output it to $simulated_dir
   then
-    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --mummer $mummer
+    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir
   else
-    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --nucleotide_probabilities $probabilities --mummer $mummer
+    python evolve_genome/genome_evolver.py --refgenome $ref --percent $percent --num_genomes $num_genomes --outputdir $simulated_dir --nucleotide_probabilities $probabilities
   fi
 fi
 
@@ -267,9 +267,9 @@ then
   if [ "$OS" == "Darwin" ];
   then
     printf "currdir: "$currdir
-    ./FastTreeMP_osx -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
+    ./FastTreeMP_osx -nt -slow -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
   elif [ "$OS" == "Linux" ]; then
-    ./FastTreeMP_linux -nt -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
+    ./FastTreeMP_linux -nt -slow -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
   fi
   cd $currdir
   
@@ -291,6 +291,18 @@ then
   java -jar $currdir/tree_comp/bin/TreeCmp.jar -N -m -d ms rf pd qt -i $simulation_res/mergedtrees.tree\
    -o $simulation_res/parsnp/distances-refvsksnp.txt -I -P
 
+   filename=$(basename "$ref")
+   printf "ref: $ref"
+   fileExtension="${filename##*.}"
+   printf "FileextensioN: $fileExtension\n"
+    printf "assert file: \n"
+    file $currdir/tree_neighbour_score/out/production/testnewickparser/Main.class
+    printf "\n"
+    #TODO: create wrapper that takes care of these results and combines them with their origin AND use them iff "$simualte" is active, -> also run on reference tree
+    #TODO: addsupport for.ref in filename
+    java -classpath $currdir/tree_neighbour_score/out/production/testnewickparser Main $ksnp_output/ksnp.tree $fileExtension > $run_specific/ksnptreesim.sim
+    java -classpath $currdir/tree_neighbour_score/out/production/testnewickparser Main $parsnp_output/parsnp.tree $fileExtension > $run_specific/parsnptreesim.sim
+    java -classpath $currdir/tree_neighbour_score/out/production/testnewickparser Main $simulated_dir/reference-tree.tree $fileExtension > $run_specific/reference/treesim.sim
 
   printf "after simulation res\n"
 fi
@@ -315,7 +327,6 @@ java -jar $currdir/tree_comp/bin/TreeCmp.jar -N -m -d ms rf pd qt -i $run_specif
  -o $run_specific/tree-distances.txt -I -P
 
 printf "\nTree comparison -> Done \n"
-
 
 
 ###    Space saving    ### (moved here so there is less to cp below:)

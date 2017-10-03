@@ -33,6 +33,8 @@ def readfiles(files):
 
 def remove_most_frequent_base_per_position_ksnp_if_all_genomes_have_snp(num_genomes, SNPs_loci): #ksnp only
     # ONLY remove most frequent base IFF all genomes are listed
+
+
     for pos,value in SNPs_loci.iteritems():
         for toolname,snpdict in value.iteritems(): #value= dict where key= toolname and value = list of snips
             if toolname == "kSNP" and len(snpdict) == num_genomes:
@@ -41,11 +43,15 @@ def remove_most_frequent_base_per_position_ksnp_if_all_genomes_have_snp(num_geno
                 snp_counts = Counter(map(lambda x: x[1], snp_mapping)) # count snps
                 most_frequent_snps = snp_counts.most_common(2)# fetch most frequent snp
                 most_frequent_snp_one = most_frequent_snps[0] # [i] = list element of ([0] = Snps, [1] = position)
-                most_frequent_snp_two = most_frequent_snps[1]
-                if most_frequent_snp_one[1] > most_frequent_snp_two[1]:
-                    for filename, snp in snp_mapping: #remove most frequent in genomes
-                        if snp == most_frequent_snp_one[1]:
-                            del snpdict[filename]
+
+                if len(most_frequent_snps) > 2:
+                    most_frequent_snp_two = most_frequent_snps[1]
+                    if most_frequent_snp_one[1] <= most_frequent_snp_two[1]:
+                        break
+
+                for filename, snp in snp_mapping: #remove most frequent in genomes
+                    if snp == most_frequent_snp_one[1]:
+                        del snpdict[filename]
 
     return SNPs_loci
 

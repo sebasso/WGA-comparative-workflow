@@ -1185,7 +1185,7 @@ if __name__ == "__main__":
         exit(1)
 
     #fasttreeOPTIONS HERE:(same as in ksnp)
-    command = "%s/ft -nt -gtr -slow "%(PARSNP_DIR)+outputDir+os.sep+"parsnp.snps.mblocks > "+outputDir+os.sep+"parsnp.tree"
+    command = "%s/ft -nt -slow -gtr "%(PARSNP_DIR)+outputDir+os.sep+"parsnp.snps.mblocks > "+outputDir+os.sep+"parsnp.tree"
     print "-->Reconstructing core genome phylogeny.."
     run_command(command)
     #7)reroot to midpoint
@@ -1269,8 +1269,8 @@ if __name__ == "__main__":
     if not VERBOSE and os.path.exists("%s/all_mumi.ini"%(outputDir)):
         os.remove("%s/all_mumi.ini"%(outputDir))
 
-    if os.path.exists("%s/parsnp.snps.mblocks"%(outputDir)):
-        os.remove("%s/parsnp.snps.mblocks"%(outputDir))
+    #if os.path.exists("%s/parsnp.snps.mblocks"%(outputDir)):
+     #   os.remove("%s/parsnp.snps.mblocks"%(outputDir))
      #commented out in order for galaxy to save contents of it, will be deleted anyway by the scheduler
 
     if not VERBOSE and os.path.exists("%s/all.mumi"%(outputDir)):
