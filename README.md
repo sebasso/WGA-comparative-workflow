@@ -1,6 +1,3 @@
-
-
-
 # Structure
 ```
  WGA-comparative-workflow/
