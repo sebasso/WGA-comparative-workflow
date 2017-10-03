@@ -29,7 +29,7 @@ harvest low:
 sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 0.03 -num_genomes 32 -name simulationCampbylobacterHarvestLow
 
 harvest medium:
-sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 0.3 -num_genomes 32 -name simulationHarvestMed
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 0.3 -num_genomes 32 -name simulationCampylobacterHarvestMed
 
 harvest high:
 sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 3.03 -num_genomes 32 -name simulationCampylobacterHarvestHigh
@@ -71,24 +71,33 @@ sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_
 5:
 sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 5 -num_genomes 32 -name simulationEcoliTree
 
+
 *************************************************************************************************************************************************
+
+*************************************************
+if time run:
+ksnp_runnable_abel.sh on ecoli and campybo reads.
+*************************************************
+
+*************************************************************************************************************************************************
+
 
 
 SQUEUESnums ON RUNS:
 assembli runs:
 ecoli:
-18507090
+18507777
 campylobacter:
-18507091
+18507780
 
 SIMULATION RUNS:
 campylobacter:
 harvest low:
-
+18507791
 harvest medium:
-
+18507793
 harvest high:
-
+18507796
 1:
 
 2:
@@ -101,11 +110,11 @@ harvest high:
 
 ecoli:
 harvest low:
-
+18507797
 harvest medium:
-
+18507819
 harvest high:
-
+18507824
 1:
 
 2:
@@ -115,4 +124,3 @@ harvest high:
 4:
 
 5:
-
