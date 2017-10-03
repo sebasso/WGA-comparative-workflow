@@ -1,0 +1,118 @@
+For å være sikker del bare antall snipper på to.
+Parsnip low: oppgitt i %
+((2847/2)/4600000)*100 = 0,03094565217
+Med:
+((28974/2)/4600000)*100 = 0,3149347826
+high
+((279026/2)/4600000)*100 = 3,0328913043
+ref: https://www.cbcb.umd.edu/software/harvest
+
+assemblies: NEED this to simulate on ecoli and campylobacter assemblies- num_genomes
+num ecolis: ???????
+num campylobacter: ???????
+
+
+TEST::::: must be okey before running rest!
+sbatch workflowmanager.sh -ref /usit/abel/u1/sebasso/genomes/EEE_Florida91-4697.fasta -genomedir /usit/abel/u1/sebasso/genomes -CPUS 12 -abel 1
+18507530
+
+
+assembli runs:
+ecoli:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -genomedir /work/projects/nn9305k/compgenomes/rawdata/ecoli_asms -CPUS 20 -abel 1
+campylobacter:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -genomedir /work/projects/nn9305k/compgenomes/rawdata/campy_asms -CPUS 20 -abel 1
+
+SIMULATION RUNS:
+campylobacter:
+harvest low:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 0.03 -num_genomes 32 -name simulationCampbylobacterHarvestLow
+
+harvest medium:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 0.3 -num_genomes 32 -name simulationHarvestMed
+
+harvest high:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 3.03 -num_genomes 32 -name simulationCampylobacterHarvestHigh
+
+1:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 1 -num_genomes 32 -name simulationCampylobacterONE
+
+2:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 2 -num_genomes 32 -name simulationCampylobacterTWO
+
+3:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 3 -num_genomes 32 -name simulationCampylobacterTree
+
+4:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 4 -num_genomes 32 -name simulationCampylobacterFour
+
+5:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/campy_ncbi/use/GCF_000009085.1_ASM908v1_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 5 -num_genomes 32 -name simulationCampylobacterFive
+
+
+ecoli:
+harvest low:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 0.03 -num_genomes 32 -name simulationEcoliHarvestLow
+
+harvest medium:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 0.3 -num_genomes 32 -name simulationEcoliHarvestMed
+
+harvest high:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 3.03 -num_genomes 32 -name simulationEcoliHarvestHigh
+
+1:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 1 -num_genomes 32 -name simulationEcoliOne
+2:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 2 -num_genomes 32 -name simulationEcoliTwo
+3:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 3 -num_genomes 32 -name simulationEcoliTree
+4:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 4 -num_genomes 32 -name simulationEcoliTree
+5:
+sbatch workflowmanager.sh -ref /work/projects/nn9305k/compgenomes/rawdata/ecoli_ncbi/use/GCF_000005845.2_ASM584v2_genomic.fna -CPUS 20 -abel 1 -simulate 1 -percent 5 -num_genomes 32 -name simulationEcoliTree
+
+*************************************************************************************************************************************************
+
+
+SQUEUESnums ON RUNS:
+assembli runs:
+ecoli:
+18507090
+campylobacter:
+18507091
+
+SIMULATION RUNS:
+campylobacter:
+harvest low:
+
+harvest medium:
+
+harvest high:
+
+1:
+
+2:
+
+3:
+
+4:
+
+5:
+
+ecoli:
+harvest low:
+
+harvest medium:
+
+harvest high:
+
+1:
+
+2:
+
+3:
+
+4:
+
+5:
+
