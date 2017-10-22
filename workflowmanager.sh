@@ -272,7 +272,7 @@ then
     ./FastTreeMP_linux -nt -slow -gtr $simulated_dir/fasttreeoutput.fasta > $simulated_dir/reference-tree.tree
   fi
   cd $currdir
-  
+
   python $currdir/tree_comparator.py $simulation_res/parsnp $parsnp_output/parsnp.tree $simulated_dir/reference-tree.tree
   file $ksnp_output/ksnp.tree
   file $simulated_dir/reference-tree.tree
@@ -292,12 +292,9 @@ then
    -o $simulation_res/parsnp/distances-refvsksnp.txt -I -P
 
    filename=$(basename "$ref")
-   printf "ref: $ref"
    fileExtension="${filename##*.}"
-   printf "FileextensioN: $fileExtension\n"
-    printf "assert file: \n"
-    file $currdir/tree_neighbour_score/out/production/testnewickparser/Main.class
-    printf "\n"
+
+
     #TODO: create wrapper that takes care of these results and combines them with their origin AND use them iff "$simualte" is active, -> also run on reference tree
     #TODO: addsupport for.ref in filename
     java -classpath $currdir/tree_neighbour_score/out/production/testnewickparser Main $ksnp_output/ksnp.tree $fileExtension > $run_specific/ksnptreesim.sim

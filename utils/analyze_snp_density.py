@@ -18,11 +18,11 @@ def find_snp_density(k, snp_file):
 		if(temp < k):
 			closerthan_k.append(tuple(sorted_snps[i+1]+sorted_snps[i]))
 
-	print "Density < k/2: ", len(closerthan_k_dividedby2), " Density < k: ",len(closerthan_k)
-
+	#print "Density < k/2: ", len(closerthan_k_dividedby2), " Density < k: ",len(closerthan_k)
+	print len(closerthan_k)
 
 if __name__ == '__main__':
-	print len(sys.argv)
+	#print len(sys.argv)
 	if len(sys.argv) < 3:
 		print "python analyze_snp_density.py 4 somesnpfiledict.fasta1"
 		exit(1)
